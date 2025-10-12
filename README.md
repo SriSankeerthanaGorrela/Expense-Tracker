@@ -14,9 +14,52 @@ A simple and modern expense tracker built with **Next.js**, **Tailwind CSS**, **
 - Dashboard view with summaries \& analytics
 - Real-time database sync using Firebase Firestore
 - Responsive design (mobile \& desktop)
-- (Optional) Push notifications for reminders
+- Push notifications for reminders
 
 ***
+
+- **Recurring Expenses \& Subscription Tracking**
+Detect and manage regular bills or subscriptions (Netflix, insurance, gym).
+- **Budgets \& Goals**
+Set monthly/weekly budgets by category and visualize spending progress; create savings goals.
+- **Receipt Upload \& OCR**
+Attach receipt images to expenses and use OCR to auto-fill details from photos.
+- **Bank Integration/Auto Import**
+Sync transactions from bank accounts, credit cards, or UPI wallets.
+- **Analytics Dashboard**
+Interactive charts, trends, and spending insights over time.
+- **Real-time Notifications \& Alerts**
+Push alerts for budget limits, upcoming bills, or unusual activity.
+- **Export \& Download Data**
+Export expenses to CSV/PDF for offline use or tax purposes.
+- **Multi-currency Support**
+Track expenses in different currencies, with automatic conversions.
+- **Group/Family Sharing**
+Share expenses and budgets between multiple users; collaborative household or team finance.
+- **Mileage \& Travel Expense Tracking**
+Log business travel expenses and calculate mileage for reimbursements.
+- **Offline Entry/Cloud Sync**
+Add expenses offline and sync changes when online.
+- **Collaborative Notes & Comments**
+Leave comments or attach notes on shared expenses—great for families, roommates, or business teams.
+- **Dark/Light Theme Switching**
+Enable users to switch between dark and light themes for better accessibility and comfort.
+- **Global Search**
+Global search bar to quickly find any transaction, notes, or category.
+- **Expense Tagging with Hashtags**
+For custom searches (e.g., #worktrip, #grocery)
+- **Category Customization**
+Allow users to create and manage their own custom expense categories.
+- **Integration with Accounting/Tax Software**
+Connect with QuickBooks, Excel, or other tools for workflow and reporting.
+- **Advanced Filtering \& Search**
+Find expenses by tags, notes, merchants, locations, etc.
+- **AI-driven Insights**
+Get personalized advice, spend predictions, and saving tips based on habits.
+
+These features can make your expense tracker app much more powerful, competitive, and useful for different users!
+
+
 
 ## Technologies Used
 
