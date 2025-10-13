@@ -1,34 +1,149 @@
-# Expense-Tracker
-A simple expense tracker application built with React and Spring Boot.
+
+
+# Expense Tracker
+
+A simple and modern expense tracker built with **Next.js**, **Tailwind CSS**, **TypeScript**, and **Firebase**. Easily add, view, edit, and delete your expenses, with secure authentication and real-time updates.
+
+***
+
 ## Features
+
+- User authentication (Firebase Auth)
 - Add, edit, and delete expenses
-- View expenses by category and date
-- Responsive design for mobile and desktop
+- Categorize expenses (e.g. food, travel, shopping)
+- Dashboard view with summaries \& analytics
+- Real-time database sync using Firebase Firestore
+- Responsive design (mobile \& desktop)
+- Push notifications for reminders
+
+***
+
+- **Recurring Expenses \& Subscription Tracking**
+Detect and manage regular bills or subscriptions (Netflix, insurance, gym).
+- **Budgets \& Goals**
+Set monthly/weekly budgets by category and visualize spending progress; create savings goals.
+- **Receipt Upload \& OCR**
+Attach receipt images to expenses and use OCR to auto-fill details from photos.
+- **Bank Integration/Auto Import**
+Sync transactions from bank accounts, credit cards, or UPI wallets.
+- **Analytics Dashboard**
+Interactive charts, trends, and spending insights over time.
+- **Real-time Notifications \& Alerts**
+Push alerts for budget limits, upcoming bills, or unusual activity.
+- **Export \& Download Data**
+Export expenses to CSV/PDF for offline use or tax purposes.
+- **Multi-currency Support**
+Track expenses in different currencies, with automatic conversions.
+- **Group/Family Sharing**
+Share expenses and budgets between multiple users; collaborative household or team finance.
+- **Mileage \& Travel Expense Tracking**
+Log business travel expenses and calculate mileage for reimbursements.
+- **Offline Entry/Cloud Sync**
+Add expenses offline and sync changes when online.
+- **Collaborative Notes & Comments**
+Leave comments or attach notes on shared expenses—great for families, roommates, or business teams.
+- **Dark/Light Theme Switching**
+Enable users to switch between dark and light themes for better accessibility and comfort.
+- **Global Search**
+Global search bar to quickly find any transaction, notes, or category.
+- **Expense Tagging with Hashtags**
+For custom searches (e.g., #worktrip, #grocery)
+- **Category Customization**
+Allow users to create and manage their own custom expense categories.
+- **Integration with Accounting/Tax Software**
+Connect with QuickBooks, Excel, or other tools for workflow and reporting.
+- **Advanced Filtering \& Search**
+Find expenses by tags, notes, merchants, locations, etc.
+- **AI-driven Insights**
+Get personalized advice, spend predictions, and saving tips based on habits.
+
+These features can make your expense tracker app much more powerful, competitive, and useful for different users!
+
+
+
 ## Technologies Used
-Backend: Spring Boot, Firebase Admin SDK
-Database: Firebase Cloud Firestore (or MongoDB, optional)
-Authentication: Firebase Authentication
-Push Notifications: Firebase Cloud Messaging (FCM)
-Build Tool: Maven
 
-## Prerequisites
-Java 11 or higher
-Spring Boot 2.5 or higher
-Firebase project (creates service account, enables Auth, Firestore, FCM)
-Maven
+- [Next.js](https://nextjs.org/) (frontend and backend API routes)
+- [Tailwind CSS](https://tailwindcss.com/) (styling)
+- [TypeScript](https://www.typescriptlang.org/) (type safety)
+- [Firebase](https://firebase.google.com/) (Auth + Firestore + Cloud Messaging)
+- (Optional) Chart.js or Recharts (dashboard charts/graphs)
 
-## Architecture of Backend
-The backend of the Expense Tracker application is built using Spring Boot, which provides a robust framework for developing RESTful APIs. The architecture follows a layered approach, separating concerns into different layers for better maintainability and scalability.
-### Layers
-1. **Controller Layer**: This layer handles incoming HTTP requests and maps them to appropriate service
-    methods. It uses Spring's `@RestController` annotation to define REST endpoints.
-2. **Service Layer**: This layer contains the business logic of the application. It processes data received from the controller layer and interacts with the repository layer to perform CRUD operations.
-3. **Repository Layer**: This layer is responsible for data access and interaction with the database. It uses Spring Data JPA to simplify database operations and provides an abstraction over the underlying data source.
-4. **Model Layer**: This layer defines the data structures used in the application, typically represented as Java classes annotated with JPA annotations to map them to database tables.
-### Technologies    
-- **Spring Boot**: Provides the framework for building the backend application.
-- **Spring Data JPA**: Simplifies database interactions and provides a repository abstraction.
-- **Hibernate**: An ORM (Object-Relational Mapping) tool used for mapping Java objects to database tables.
-- **Firebase**: Used for authentication, push notifications, and real-time database functionalities.
+***
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js \& npm installed
+- Firebase account
+- Clone this repository
+
+
+### Installation
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create a new [Firebase project](https://console.firebase.google.com/).
+3. Add your Firebase config to `.env.local`:
+
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+```
+
+4. Start the app locally:
+
+```bash
+npm run dev
+```
+
+
+***
+
+## Folder Structure
+
+```
+/expense-tracker
+│
+├── app/              # Pages, API routes, layouts (Next.js)
+├── components/       # UI components (forms, dashboard)
+├── lib/              # Firebase config, helpers
+├── types/            # TypeScript types & interfaces
+├── styles/           # Tailwind/global CSS
+├── public/           # Static assets
+├── .env.local        # Environment variables (do NOT share/secrets)
+└── README.md
+```
+
+
+***
+
+## Usage
+
+- Sign up/log in using your email or Google
+- Add your expenses
+- View and filter expenses by category or date
+- Edit or delete entries
+- See summaries and basic analytics on your dashboard
+
+***
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first.
+
+***
+
+## License
+
+This project is licensed under the MIT License.
 
