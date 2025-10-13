@@ -34,3 +34,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+# Next.js acts as both frontend and backend, but for authentication, it only acts as a client that talks directly to Firebase.
+
+# 3. What Happens After Registration
+
+When a user registers successfully:
+
+Firebase Auth creates a user record in the Authentication Users list
+
+It returns a user object to your app (contains uid, email, etc.)
+
+That user is now considered logged in
+
+The Firebase SDK automatically stores a session token in the browser
+
+On page refresh, it automatically restores the session (using onAuthStateChanged)
+
+You don’t need to handle cookies, tokens, or sessions manually.
