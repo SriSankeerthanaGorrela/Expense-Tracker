@@ -3,33 +3,50 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import { useForm } from "react-hook-form";
 import { auth } from "../lib/firebase";
 import { useRouter } from "next/navigation";
-import { Lock,Mail } from "lucide-react";
-
+import { Lock, Mail } from "lucide-react";
+import { useAuthStore } from "../store/authstore";
 
 export default function AuthForm({ value }: { value: string }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
-    defaultValues: { email: "", password: "" }
+    defaultValues: { email: "", password: "" },
   });
 
   const router = useRouter();
+  const { login } = useAuthStore();
 
   async function onSubmit(data: any) {
     const { email, password } = data;
 
     try {
       if (value === "Register") {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const userData = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+        };
+
+        // 🔹 Save user to Zustand store
+        login(userData);
+
         reset();
         alert("User registered successfully!");
-        router.push("/login");
+        router.push("/");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userData = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+        };
+
+        // 🔹 Save user to Zustand store
+        login(userData);
+
         reset();
         alert("Login successful!");
-        router.push("/dashboard");
+        router.push("/");
       }
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
       alert(err.message);
     }
   }
@@ -43,6 +60,7 @@ export default function AuthForm({ value }: { value: string }) {
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">{value}</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Email */}
           <div className="relative">
             <Mail className="absolute top-3 left-3 w-5 h-5 text-gray-400" />
             <input
@@ -60,6 +78,7 @@ export default function AuthForm({ value }: { value: string }) {
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
 
+          {/* Password */}
           <div className="relative">
             <Lock className="absolute top-3 left-3 w-5 h-5 text-gray-400" />
             <input
@@ -67,8 +86,8 @@ export default function AuthForm({ value }: { value: string }) {
               placeholder="Password"
               {...register("password", {
                 required: "Password is required",
-                pattern: {
-                  value: /^.{6,}$/,
+                minLength: {
+                  value: 6,
                   message: "Password must be at least 6 characters",
                 },
               })}
@@ -77,6 +96,7 @@ export default function AuthForm({ value }: { value: string }) {
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
             className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-semibold"
@@ -85,6 +105,7 @@ export default function AuthForm({ value }: { value: string }) {
           </button>
         </form>
 
+        {/* Switch Between Login/Register */}
         <p className="text-center mt-4 text-gray-500">
           {value === "Login" ? "Don't have an account?" : "Already have an account?"}{" "}
           <button onClick={handleClick} className="text-blue-600 font-semibold hover:underline">
@@ -95,3 +116,9 @@ export default function AuthForm({ value }: { value: string }) {
     </div>
   );
 }
+// const { user } = await signInWithEmailAndPassword(auth, email, password);
+// const userData = {
+//   uid: user.uid,      // unique Firebase identifier
+//   email: user.email,  // the login email
+// };
+// login(userData);      // store in Zustand
