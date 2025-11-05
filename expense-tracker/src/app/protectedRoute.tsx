@@ -5,7 +5,9 @@ import { useAuthStore } from "./store/authstore";
 import AuthLayout from "./(auth)/layout";
 import Login from "./(auth)/login/page";
 import Register from "./(auth)/register/page";
-import Topbar from "./Topbar/topbar";
+import { Topbar } from "./Topbar/topbar";
+import { Sidebar } from "./sidebar/page";
+
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenicated, isLoading, checkAuth } = useAuthStore();
@@ -39,18 +41,18 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   // 🔹 Show protected content
   return (
-    <div className="antialiased m-0 p-0 h-screen overflow-hidden">
-      <div className="flex h-full">
-        {/* Sidebar (optional) */}
-        {/* <Sidebar /> */}
+   
+    <div className="antialiased h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
+      {/* Full-width Topbar */}
+      <Topbar />
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col md:!ml-50 ml-![12.5rem]">
-          <Topbar />
-          <main className="flex-1 overflow-hidden flex flex-col">
-            <div className="flex-1 overflow-auto p-4">{children}</div>
-          </main>
-        </div>
+      {/* Below Topbar: Sidebar + Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+
+        <main className="flex-1 overflow-y-auto p-4">
+          {children}
+        </main>
       </div>
     </div>
   );
