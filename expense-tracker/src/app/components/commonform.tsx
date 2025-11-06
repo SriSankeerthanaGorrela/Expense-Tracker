@@ -1,10 +1,11 @@
 "use client";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 import { useRouter } from "next/navigation";
 import { Lock, Mail } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function AuthForm({ value }: { value: string }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
@@ -20,27 +21,47 @@ export default function AuthForm({ value }: { value: string }) {
     try {
       if (value === "Register") {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const userData = {
+        const user = {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
         };
+         await setDoc(doc(db, "users", user.uid), {
+    uid: user.uid,
+    email: user.email,
+    isNewuser: true, // 👈 new user
+           createdAt: new Date(),
+    name:""
+  });
 
         // 🔹 Save user to Zustand store
-        login(userData);
+        login({
+        uid: user.uid,
+        email: user.email,
+          isNewuser: true,
+        name:""
+      });
 
         reset();
         alert("User registered successfully!");
         router.push("/");
-      } else {
+      }  else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const userData = {
-          uid: userCredential.user.uid,
+        const uid = userCredential.user.uid;
+
+        // ✅ Fetch the Firestore user document
+        const docRef = doc(db, "users", uid);
+        const docSnap = await getDoc(docRef);
+        let userData = {
+          uid,
           email: userCredential.user.email,
+          isNewuser: false,
         };
 
-        // 🔹 Save user to Zustand store
-        login(userData);
+        if (docSnap.exists()) {
+          userData = { ...userData, ...docSnap.data() };
+        }
 
+        login(userData);
         reset();
         alert("Login successful!");
         router.push("/");
@@ -56,7 +77,7 @@ export default function AuthForm({ value }: { value: string }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center w-full bg-gradient-to-br from-sky-50 via-teal-50 to-blue-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">{value}</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

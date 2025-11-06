@@ -19,8 +19,26 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-gradient-to-br from-sky-50 via-teal-50 to-blue-50 text-gray-900;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+
+.scroll-container {
+  scrollbar-width: none;
+}
+.scroll-container::-webkit-scrollbar {
+  width: 0px;
+}
+
+.scroll-container:hover {
+  scrollbar-width: thin;
+}
+.scroll-container:hover::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-container:hover::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 4px;
 }

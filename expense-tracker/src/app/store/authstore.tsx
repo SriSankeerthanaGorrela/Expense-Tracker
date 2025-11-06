@@ -5,7 +5,8 @@ type AuthStore = {
   isLoading: boolean;
   user: unknown | null;
   isAuthenicated: boolean;
-  login: (userData: unknown) => void;
+  isNewuser: boolean;
+  login: (userData: any) => void;
   logout: () => void;
   checkAuth: () => void;
 };
@@ -15,27 +16,34 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       isLoading: true,
+      isNewuser: false,
       isAuthenicated: false,
 
-      // 🔹 Login: Save to localStorage and update Zustand
       login: (userData) => {
-        localStorage.setItem("userData", JSON.stringify(userData)); // ✅ consistent key
-        set({ user: userData, isAuthenicated: true });
+        localStorage.setItem("userData", JSON.stringify(userData));
+        set({
+          user: userData,
+          isAuthenicated: true,
+          isNewuser: userData?.isNewuser ?? false,
+        });
       },
 
-      // 🔹 Logout: Clear data
       logout: () => {
         localStorage.removeItem("userData");
-        set({ user: null, isAuthenicated: false });
+        set({ user: null, isAuthenicated: false, isNewuser: false });
       },
 
-      // 🔹 Check if user exists in localStorage
       checkAuth: () => {
         try {
           const stored = localStorage.getItem("userData");
           if (stored) {
             const userData = JSON.parse(stored);
-            set({ user: userData, isAuthenicated: true, isLoading: false });
+            set({
+              user: userData,
+              isAuthenicated: true,
+              isLoading: false,
+              isNewuser: userData?.isNewuser ?? false,
+            });
           } else {
             set({ isLoading: false });
           }
@@ -45,8 +53,6 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
     }),
-    {
-      name: "auth-storage",
-    }
+    { name: "auth-storage" }
   )
 );

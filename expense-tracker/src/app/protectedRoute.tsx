@@ -8,29 +8,49 @@ import Register from "./(auth)/register/page";
 import { Topbar } from "./Topbar/topbar";
 import { Sidebar } from "./sidebar/page";
 
-
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenicated, isLoading, checkAuth } = useAuthStore();
+  const { isAuthenicated, isLoading, isNewuser, checkAuth } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
 
-  // 🔹 Run auth check on mount
+  // Run auth check on mount
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  // 🔹 Redirect to main page after login
+  // Redirect logic
   useEffect(() => {
-    if (!isLoading && isAuthenicated) {
-      router.replace("/");
+    if (!isLoading) {
+      if (!isAuthenicated) {
+        if (pathname !== "/login" && pathname !== "/register") {
+          router.replace("/login");
+        }
+      } else if (isNewuser) {
+        if (pathname !== "/form") {
+          router.replace("/form");
+        }
+      } else {
+        if (
+          pathname === "/login" ||
+          pathname === "/register" ||
+          pathname === "/form"
+        ) {
+          router.replace("/");
+        }
+      }
     }
-  }, [isAuthenicated, router, isLoading]);
+  }, [isAuthenicated, isNewuser, isLoading, pathname, router]);
 
+  // Loading state
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
-  // 🔹 Show auth pages if not authenticated
+  // Not logged in → Auth pages
   if (!isAuthenicated) {
     return (
       <AuthLayout>
@@ -39,20 +59,18 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // 🔹 Show protected content
-  return (
-   
-    <div className="antialiased h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
-      {/* Full-width Topbar */}
-      <Topbar />
+  // ✅ If user is on /form → show only the form, no layout
+  if (pathname === "/form") {
+    return children;
+  }
 
-      {/* Below Topbar: Sidebar + Main Content */}
+  // ✅ Otherwise → show main app layout
+  return (
+    <div className="antialiased h-screen flex flex-col">
+      <Topbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-
-        <main className="flex-1 overflow-y-auto p-4">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-4">{children}</main>
       </div>
     </div>
   );
