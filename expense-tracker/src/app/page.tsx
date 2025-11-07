@@ -1,11 +1,14 @@
+import { ArrowBigDown } from "lucide-react";
 import Login from "./(auth)/login/page"
+import DashboardPage from "./dashboard/page";
+
 
 
 
 export default function Home() {
   return (
     <div>
-      <h1>Welcome to the Expense Tracker</h1>
+      <DashboardPage/>
      
     </div>
   );
