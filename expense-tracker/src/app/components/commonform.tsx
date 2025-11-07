@@ -55,7 +55,7 @@ export default function AuthForm({ value }: { value: string }) {
 
         reset();
         alert("User registered successfully!");
-        router.push("/");
+        router.push("/dashboard");
       } else {
         const userCredential = await signInWithEmailAndPassword(
           auth,
@@ -80,7 +80,7 @@ export default function AuthForm({ value }: { value: string }) {
         login(userData);
         reset();
         alert("Login successful!");
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err: any) {
       console.error(err);
