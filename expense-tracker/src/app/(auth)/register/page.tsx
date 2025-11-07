@@ -2,7 +2,7 @@ import React from 'react'
 import CommonForm from '../../components/commonform';
 function Register() {
   return (
-    <div>
+    <div className='w-full '>
       <CommonForm value="Register" />
     </div>
   )
