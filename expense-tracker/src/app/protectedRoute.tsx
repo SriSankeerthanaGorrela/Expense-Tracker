@@ -35,7 +35,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
           pathname === "/register" ||
           pathname === "/form"
         ) {
-          router.replace("/");
+          router.replace("/dashboard");
         }
       }
     }
