@@ -7,7 +7,7 @@ import {
   PieChart,
   Target,
   FileText,
-  Bell,
+  TargetIcon,
   Tags,
   Wallet2,
   Settings,
@@ -24,7 +24,7 @@ const navItems = [
 ];
 
 const utilityItems = [
-  { name: "Reminders", icon: Bell, path: "/reminders" },
+  { name: "Goals", icon: TargetIcon, path: "/goals" },
   { name: "Categories", icon: Tags, path: "/categories" },
   { name: "Accounts", icon: Wallet2, path: "/accounts" },
 ];

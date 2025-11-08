@@ -1,23 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type UserData = {
-  uid?: string;
-  email?: string;
-  name?: string;
-  isNewuser?: boolean;
-  [key: string]: any; // for other optional fields
-};
-
 type AuthStore = {
   isLoading: boolean;
-  user: UserData | null;
+  user: unknown | null;
   isAuthenicated: boolean;
   isNewuser: boolean;
-  login: (userData: UserData) => void;
+  login: (userData: any) => void;
   logout: () => void;
   checkAuth: () => void;
-  setIsNewuser: (value: boolean) => void; // ✅ Added
 };
 
 export const useAuthStore = create<AuthStore>()(
@@ -60,17 +51,6 @@ export const useAuthStore = create<AuthStore>()(
           console.error("Auth check failed:", error);
           set({ isLoading: false });
         }
-      },
-
-      // ✅ Safely update both Zustand & localStorage
-      setIsNewuser: (value) => {
-        const currentUser = get().user;
-        if (!currentUser) return;
-
-        const updatedUser: UserData = { ...currentUser, isNewuser: value };
-
-        localStorage.setItem("userData", JSON.stringify(updatedUser));
-        set({ user: updatedUser, isNewuser: value });
       },
     }),
     { name: "auth-storage" }
