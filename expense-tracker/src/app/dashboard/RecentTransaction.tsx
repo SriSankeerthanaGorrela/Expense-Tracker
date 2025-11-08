@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-type Transaction = {
+export type Transaction = {
   icon?: React.ReactNode;
   description: string;
   payment?:string;

@@ -43,9 +43,13 @@ export default function AuthForm({ value }: { value: string }) {
 
         reset();
         alert("User registered successfully!");
-        router.push("/");
-      }  else {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        router.push("/dashboard");
+      } else {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
         const uid = userCredential.user.uid;
 
         // ✅ Fetch the Firestore user document
@@ -64,7 +68,7 @@ export default function AuthForm({ value }: { value: string }) {
         login(userData);
         reset();
         alert("Login successful!");
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err: any) {
       console.error(err);

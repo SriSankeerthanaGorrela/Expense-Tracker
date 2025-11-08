@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 
 type Goal = {
   id: number;
@@ -60,7 +60,7 @@ function ThirdStep() {
       await updateDocument({ goals,isNewuser:false });
       alert("✅ Goals saved successfully!");
       setIsNewuser(false);
-      router.push("/")
+      router.push("/dashboard")
       
     } catch (error) {
       console.error("Error updating goals:", error);

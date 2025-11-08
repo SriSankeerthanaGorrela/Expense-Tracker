@@ -16,7 +16,7 @@ import {
 import { useAuthStore } from "../store/authstore";
 
 const navItems = [
-  { name: "Dashboard", icon: Home, path: "/" },
+  { name: "Dashboard", icon: Home, path: "/dashboard" },
   { name: "Transactions", icon: List, path: "/transactions" },
   { name: "Budgets", icon: Target, path: "/budgets" },
   { name: "Analytics", icon: PieChart, path: "/analytics" },
@@ -55,7 +55,7 @@ export function Sidebar() {
               onClick={() => handleNav(item.path)}
               className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors ${
                 active
-                  ? "bg-emerald-500 text-white"
+                  ? "bg-teal-400 text-white"
                   : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
               }`}
             >
