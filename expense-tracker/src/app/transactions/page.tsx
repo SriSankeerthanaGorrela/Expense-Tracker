@@ -87,6 +87,7 @@ function page() {
   ];
   const[filteredTransaction,setFilteredTransaction]=useState(recentTransaction)
   const [search, setSearch] = useState("")
+  const [categories,setCategories]=useState("All")
   const filteredData = (query:string) => {
     const lowerQuery = query.toLowerCase();
    const result= recentTransaction.filter((transaction) => 
@@ -99,9 +100,21 @@ function page() {
     )
     setFilteredTransaction(result)
   }
+const handleFilter = (selectedCategory: string) => {
+  if (selectedCategory === "All") {
+    setFilteredTransaction(recentTransaction);
+  } else {
+    const result = recentTransaction.filter(
+      (transaction) =>
+        transaction.category.toLowerCase() === selectedCategory.toLowerCase()
+    );
+    setFilteredTransaction(result);
+  }
+};
+  const category=["Food & Dining","Shopping","Entertainment","Health","Gifts","Transportation","Home","Education",'Income']
   return (
-    <div className='space-y-5 '>
-      <div>
+    <div className='space-y-10'>
+      <div className='flex justify-end gap-8'>
        <div className="relative w-1/3 ">
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
           <input
@@ -117,10 +130,29 @@ function page() {
         
         </div>
         <div>
-          {/* <select
-          value={}>
-            
-          </select> */}
+          <select
+            value={categories}
+            onChange={(e) => {
+              setCategories(e.target.value)
+              handleFilter(e.target.value)
+            }}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 
+              focus:outline-none focus:ring-2 focus:ring-blue-400
+    appearance-none"
+          >
+            <option value="All" >
+      All Categories
+    </option>
+            {category
+             
+              .map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              )
+              )
+            }
+          </select>
         </div>
 
         </div>
