@@ -1,6 +1,7 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import TransactionTable from './transactionTable'
-import { BookOpen, Briefcase, Bus, Coffee, Film, Gift, HeartPulse, Home, ShoppingBag, Wallet } from 'lucide-react';
+import { BookOpen, Briefcase, Bus, Coffee, Film, Gift, HeartPulse, Home, Search, ShoppingBag, Wallet } from 'lucide-react';
 function page() {
      const recentTransaction = [
   {
@@ -83,11 +84,47 @@ function page() {
     date: "2025-10-20",
     amount: 45000.0,
   },
-];
-
+  ];
+  const[filteredTransaction,setFilteredTransaction]=useState(recentTransaction)
+  const [search, setSearch] = useState("")
+  const filteredData = (query:string) => {
+    const lowerQuery = query.toLowerCase();
+   const result= recentTransaction.filter((transaction) => 
+     transaction.category.toLowerCase().includes(lowerQuery) ||
+       transaction.date.includes(lowerQuery) ||
+       transaction.payment.toLowerCase().includes(lowerQuery) ||
+       transaction.amount.toString().includes(lowerQuery)
+   
+     
+    )
+    setFilteredTransaction(result)
+  }
   return (
+    <div className='space-y-5 '>
       <div>
-          <TransactionTable data={recentTransaction}/>
+       <div className="relative w-1/3 ">
+          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Start search"
+            value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+              filteredData(e.target.value)
+            } }
+            className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:border-gray-700"
+        />
+        
+        </div>
+        <div>
+          {/* <select
+          value={}>
+            
+          </select> */}
+        </div>
+
+        </div>
+          <TransactionTable data={filteredTransaction}/>
     </div>
   )
 }

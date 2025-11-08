@@ -24,7 +24,7 @@ const RecentTransaction = ({ recent }: { recent: Transaction[] }) => {
           </h1>
           <button
             className="text-green-600 hover:text-green-700 text-sm font-medium"
-            onClick={() => router.push('/transaction')}
+            onClick={() => router.push('/transactions')}
           >
             View All
           </button>
