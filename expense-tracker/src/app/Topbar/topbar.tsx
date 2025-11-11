@@ -1,5 +1,3 @@
-
-
 "use client"
 import React from 'react';
 import { Moon, Sun, Bell, Wallet } from 'lucide-react';
@@ -8,7 +6,7 @@ import { useAuthStore } from '../store/authstore';
 
 export function Topbar() {
   const { user } = useAuthStore();
- 
+  console.log(user)
 
   return (
     <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40">

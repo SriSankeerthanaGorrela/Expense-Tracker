@@ -25,14 +25,18 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
         if (pathname !== "/login" && pathname !== "/register") {
           router.replace("/login");
         }
-      } else if (isNewuser) {
+      }
+      else if (isNewuser) {
         if (pathname !== "/form") {
           router.replace("/form");
+        }
+         if (pathname == "/register") {
+          router.replace("/login")
         }
       } else {
         if (
           pathname === "/login" ||
-          pathname === "/register" ||
+         
           pathname === "/form"
         ) {
           router.replace("/dashboard");

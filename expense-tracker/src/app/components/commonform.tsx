@@ -46,16 +46,13 @@ export default function AuthForm({ value }: { value: string }) {
         });
 
         // 🔹 Save user to Zustand store
-        login({
-          uid: user.uid,
-          email: user.email,
-          isNewuser: true,
-          name: "",
-        });
+       
 
         reset();
-        alert("User registered successfully!");
-        router.push("/dashboard");
+       setTimeout(() => {
+    alert("User registered successfully!");
+    router.push("/login");
+  }, 300);
       } else {
         const userCredential = await signInWithEmailAndPassword(
           auth,
@@ -71,6 +68,7 @@ export default function AuthForm({ value }: { value: string }) {
           uid,
           email: userCredential.user.email,
           isNewuser: false,
+         
         };
 
         if (docSnap.exists()) {

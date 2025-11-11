@@ -113,7 +113,10 @@ const handleFilter = (selectedCategory: string) => {
 };
   const category=["Food & Dining","Shopping","Entertainment","Health","Gifts","Transportation","Home","Education",'Income']
   return (
-    <div className='space-y-10'>
+    <div className='space-y-4'>
+      <div>   <h2 className='text-3xl font-bold '>Transactions</h2>
+      <p>view and manage all your transactions</p></div>
+   
       <div className='flex justify-end gap-8'>
        <div className="relative w-1/3 ">
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />

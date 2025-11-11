@@ -54,3 +54,51 @@ The Firebase SDK automatically stores a session token in the browser
 On page refresh, it automatically restores the session (using onAuthStateChanged)
 
 You don’t need to handle cookies, tokens, or sessions manually.
+
+users
+ └── {userId}
+      ├── profile
+      │    └── name, email, createdAt, etc.
+      │
+      ├── budgets (collection)
+      │    └── {budgetId}: {
+      │          category: "Food",
+      │          limit: 3000,
+      │          month: "2025-11" // optional, for month-wise budgets
+      │       }
+      │
+      ├── transactions (collection)
+      │    └── {transactionId}: {
+      │          category: "Food",
+      │          amount: 200,
+      │          date: "2025-11-05",
+      │          type: "expense" | "income",
+      │          note: "Dinner at Domino's"
+      │       }
+      │
+      ├── goals (collection)
+      │    └── {goalId}: {
+      │          title: "Emergency Fund",
+      │          targetAmount: 50000,
+      │          currentAmount: 15000,
+      │          deadline: "2026-03-01"
+      │       }
+      │
+      ├── insights (optional, computed and cached)
+      │    └── {insightId}: {
+      │          month: "2025-11",
+      │          summary: "You spent 20% more on Dining this month compared to last month",
+      │          createdAt: new Date()
+      │       }
+      │
+      └── reports (optional, precomputed graphs)
+           └── {reportId}: {
+                 month: "2025-11",
+                 spendingByCategory: {
+                   Food: 2000,
+                   Transport: 800,
+                   Entertainment: 1500,
+                 },
+                 monthlyTotal: 5000
+               }
+
