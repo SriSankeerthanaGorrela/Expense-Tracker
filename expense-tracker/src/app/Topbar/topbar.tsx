@@ -24,11 +24,11 @@ export function Topbar() {
           <h2 className='gradient-text w-fit text-3xl font-semibold'>Welcome back, {user?.name} !</h2>
   </div>
         <div className="flex items-center gap-4">
-          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative">
+          {/* <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative">
             <Bell className="w-5 h-5 text-slate-600 dark:text-slate-400" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
-          
+           */}
           <button
             
             className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

@@ -6,8 +6,9 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useAuthStore } from "@/app/store/authstore"; // your zustand auth store
 import { Plus, Trash2 } from "lucide-react";
 import { db } from "../lib/firebase";
+import { on } from "events";
 
-const SettingsPage = () => {
+const SettingsPage = ({ onClose }) => {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +44,7 @@ const SettingsPage = () => {
         if (userSnap.exists()) {
           reset(userSnap.data());
         }
+      
       } catch (err) {
         console.error("Error fetching user data:", err);
       } finally {
@@ -58,6 +60,7 @@ const SettingsPage = () => {
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, data);
       alert("Details updated successfully ✅");
+      if(onClose) onClose();
     } catch (err) {
       console.error("Error updating user:", err);
     }
@@ -67,11 +70,11 @@ const SettingsPage = () => {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-6">Edit Your Details</h1>
+      <h1 className="text-2xl gradient-text w-fit font-semibold">Edit Your Details</h1>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-8 bg-white shadow-lg p-6 rounded-xl border"
+        className="space-y-8 p-6  "
       >
         {/* =========================
             Personal Info Section
@@ -81,7 +84,7 @@ const SettingsPage = () => {
             <label className="block mb-2 text-sm text-gray-700">Name</label>
             <input
               {...register("name")}
-              className="w-full border p-2 rounded"
+              className="input-field"
               placeholder="Enter your name"
             />
           </div>
@@ -91,7 +94,7 @@ const SettingsPage = () => {
             <input
               {...register("email")}
               type="email"
-              className="w-full border p-2 rounded bg-gray-100"
+              className="input-field"
               readOnly
             />
           </div>
@@ -101,7 +104,7 @@ const SettingsPage = () => {
             <input
               {...register("income")}
               type="number"
-              className="w-full border p-2 rounded"
+              className="input-field"
               placeholder="Enter monthly income"
             />
           </div>
@@ -111,7 +114,7 @@ const SettingsPage = () => {
             <input
               {...register("targetSavings")}
               type="number"
-              className="w-full border p-2 rounded"
+              className="input-field"
               placeholder="Enter target savings %"
             />
           </div>
@@ -126,9 +129,9 @@ const SettingsPage = () => {
             <button
               type="button"
               onClick={() => addBudget({ name: "", amount: "" })}
-              className="flex items-center gap-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+              className="flex items-center gap-2 text-sm bg-blue-400 text-white px-5 py-2 rounded-lg hover:bg-blue-500"
             >
-              <Plus size={14} /> Add Category
+               Add Category
             </button>
           </div>
 
@@ -138,17 +141,17 @@ const SettingsPage = () => {
 
           <div className="space-y-3">
             {budgetFields.map((field, index) => (
-              <div key={field.id} className="flex gap-4 items-center border p-3 rounded">
+              <div key={field.id} className="flex gap-4 items-center  ">
                 <input
                   {...register(`budgetCategories.${index}.name`)}
                   placeholder="Category name (e.g., Food)"
-                  className="border p-2 rounded flex-1"
+                  className="input-field"
                 />
                 <input
                   {...register(`budgetCategories.${index}.amount`)}
                   placeholder="Limit (e.g., 3000)"
                   type="number"
-                  className="border p-2 rounded w-32"
+                  className="input-field"
                 />
                 <button
                   type="button"
@@ -171,9 +174,9 @@ const SettingsPage = () => {
             <button
               type="button"
               onClick={() => addGoal({ goalName: "", targetAmount: "" })}
-              className="flex items-center gap-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+              className="flex items-center gap-2 text-sm bg-blue-400 text-white px-5 py-2 rounded-lg hover:bg-blue-500"
             >
-              <Plus size={14} /> Add Goal
+               Add Goal
             </button>
           </div>
 
@@ -183,17 +186,17 @@ const SettingsPage = () => {
 
           <div className="space-y-3">
             {goalFields.map((field, index) => (
-              <div key={field.id} className="flex gap-4 items-center border p-3 rounded">
+              <div key={field.id} className="flex gap-4 items-center ">
                 <input
                   {...register(`goals.${index}.goalName`)}
                   placeholder="Goal name (e.g., Emergency Fund)"
-                  className="border p-2 rounded flex-1"
+                  className="input-field"
                 />
                 <input
                   {...register(`goals.${index}.targetAmount`)}
                   placeholder="Target (e.g., 50000)"
                   type="number"
-                  className="border p-2 rounded w-40"
+                  className="input-field"
                 />
                 <button
                   type="button"
@@ -213,7 +216,7 @@ const SettingsPage = () => {
         <div className="text-right">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="btn-primary  "
           >
             Save Changes
           </button>
