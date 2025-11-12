@@ -51,7 +51,6 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
   const { user } = useAuthStore();
   const uid = user?.uid;
    const {
-     docs: budgetCategories,
      addDocument,
         loading,
         error,
