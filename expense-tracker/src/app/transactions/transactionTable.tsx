@@ -2,9 +2,19 @@
 import React from "react";
 import { Transaction } from "../dashboard/RecentTransaction";
 import { Edit, IndianRupee, Trash } from "lucide-react";
+import { recentTransactionType } from "../components/(share_types)/AllTypes";
 
-function TransactionTable({ data }: { data: Transaction[] }) {
-  return (
+interface TransactionTableProps {
+  data: recentTransactionType[];
+  onEdit: (transaction: recentTransactionType) => void;
+  onDelete: (id: string) => void;
+}
+
+const TransactionTable: React.FC<TransactionTableProps> = ({
+  data,
+  onEdit,
+  onDelete,
+}) => {  return (
     <div className="w-full overflow-x-auto rounded-xl shadow-xl">
       <table className="min-w-full text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900">
         <thead className=" bg-blue-400 text-white">
@@ -52,10 +62,12 @@ function TransactionTable({ data }: { data: Transaction[] }) {
                     <button
                       className="text-blue-500 hover:text-blue-700 transition-colors"
                       title="Edit"
+                      onClick={()=>onEdit(t)}
                     >
                       <Edit size={17} />
                     </button>
                     <button
+                    onClick={()=>onDelete(t.id!)}
                       className="text-red-500 hover:text-red-700 transition-colors"
                       title="Delete"
                     >
