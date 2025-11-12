@@ -1,36 +1,50 @@
 import React from "react";
+import { GoalCardProps } from "./(share_types)/AllTypes";
 
-interface GoalCardProps {
-  icon: React.ReactNode;
-  title: string;
-  daysLeft: number;
-  progress: number; 
-  current: number;
-  target: number;
-  onAddMoney?: () => void;
-  onEditGoal?: () => void;
+
+
+interface CardStatProps extends GoalCardProps {
+  onEdit?: () => void;
 }
 
-const GoalCard: React.FC<GoalCardProps> = ({
+const GoalCard: React.FC<CardStatProps> = ({
   icon,
   title,
-  daysLeft,
-  progress,
+  targetDate,
   current,
   target,
-  onAddMoney,
-  onEditGoal,
+  onEdit
 }) => {
+  const today = new Date();
+  const date = new Date(targetDate);
+  const diffTime = date.getTime() - today.getTime();
+  const daysLeft = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 0);
+  const progress = Math.min(Math.round((current / target) * 100), 100);
+
   return (
     <div className="p-5 w-full bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100 dark:border-gray-700">
       
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{icon}</span>
-          <div>
+          <div className="">
             <h2 className="font-semibold text-gray-900 dark:text-white text-lg">{title}</h2>
+            
             <p className="text-sm text-gray-500 dark:text-gray-400">{daysLeft} days left</p>
           </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Target Date:{" "}
+              <span className="font-medium">
+                {date.toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            </p>
+          </div>
+           
         </div>
         <span className="text-sm font-semibold text-green-600">{progress}%</span>
       </div>
@@ -55,22 +69,22 @@ const GoalCard: React.FC<GoalCardProps> = ({
         </div>
       </div>
 
-      {onAddMoney && (
+      
         <div className="flex  justify-between p-2 items-center gap-6">
           <button
-            onClick={onAddMoney}
+          
             className="bg-green-500 hover:bg-green-600 text-white px-8 py-2 rounded-lg text-sm font-medium"
           >
             Add Money
           </button>
           <button
-            onClick={onEditGoal}
+            onClick={onEdit}
             className="text-gray-600 dark:text-gray-300 hover:underline text-sm"
           >
             Edit Goal
           </button>
         </div>
-      )}
+      
     </div>
   );
 };
