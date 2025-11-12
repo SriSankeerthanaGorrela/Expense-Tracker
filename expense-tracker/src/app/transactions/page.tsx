@@ -1,10 +1,16 @@
 "use client"
 import React, { useState } from 'react'
 import TransactionTable from './transactionTable'
-import { BookOpen, Briefcase, Bus, Coffee, Film, Gift, HeartPulse, Home, Search, ShoppingBag, Wallet } from 'lucide-react';
-function page() {
-     const recentTransaction = [
+import { BookOpen, Briefcase, Bus, Coffee, Film, Gift, HeartPulse, Home, PlusIcon, Search, ShoppingBag, Wallet } from 'lucide-react';
+import Dialog from '../components/Dialog';
+import AddTransactionForm from './AddTransactionForm';
+import { recentTransactionType } from '../components/(share_types)/AllTypes';
+export const category=["Food & Dining","Shopping","Entertainment","Health","Gifts","Transportation","Home","Education",'Income']
+
+function Page() {
+     const recentTransaction:recentTransactionType[] = [
   {
+    id:"t1",
     icon: <Coffee className="text-orange-500" />,
     description: "Lunch at Restaurant",
     category: "Food & Dining",
@@ -13,6 +19,7 @@ function page() {
     amount: -850.0,
   },
   {
+    id:"t2",
     icon: <Briefcase className="text-green-600" />,
     description: "Freelance Payment",
     payment:"Bank",
@@ -21,6 +28,7 @@ function page() {
     amount: 5000.0,
   },
   {
+    id:"t3",
     icon: <Film className="text-red-500" />,
     description: "Netflix Subscription",
      payment:"Card",
@@ -29,6 +37,7 @@ function page() {
     amount: -499.0,
   },
   {
+    id:"t4",
     icon: <ShoppingBag className="text-pink-500" />,
     description: "Mall Shopping",
      payment:"Cash",
@@ -88,6 +97,8 @@ function page() {
   const[filteredTransaction,setFilteredTransaction]=useState(recentTransaction)
   const [search, setSearch] = useState("")
   const [categories,setCategories]=useState("All")
+  const[openDialog,setOpenDialog]=useState(false)
+  const[editingTransaction,setEditingTransaction]=useState<recentTransactionType | null>(null)
   const filteredData = (query:string) => {
     const lowerQuery = query.toLowerCase();
    const result= recentTransaction.filter((transaction) => 
@@ -111,12 +122,51 @@ const handleFilter = (selectedCategory: string) => {
     setFilteredTransaction(result);
   }
 };
-  const category=["Food & Dining","Shopping","Entertainment","Health","Gifts","Transportation","Home","Education",'Income']
+
+const handleAddTransaction=(newTransaction:recentTransactionType)=>{
+  setFilteredTransaction((prev)=>[newTransaction, ...prev])
+  setOpenDialog(false)
+}
+const handleEdit = (transaction: recentTransactionType) => {
+    setEditingTransaction(transaction);
+    setOpenDialog(true);
+  };
+  const handleUpdateTransaction = (updatedTransaction: recentTransactionType) => {
+    setFilteredTransaction((prev) =>
+      prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t))
+    );
+    setEditingTransaction(null);
+    setOpenDialog(false);
+  };
+
+    const handleDeleteTransaction = (id: string) => {
+  if (confirm("Are you sure you want to delete this transaction?")) {
+
+    //id="t2", filter runs like-> t1->"t1"!=="t2" ==> condition is true, we keep it
+    //                            t2->"t2"!=="t2"==>condition is false , remove it
+    setFilteredTransaction((prev) => prev.filter((t) => t.id !== id));
+  }
+};
+
+
   return (
     <div className='space-y-4'>
-      <div>   <h2 className='text-3xl font-bold '>Transactions</h2>
-      <p>view and manage all your transactions</p></div>
-   
+      <div className='flex justify-between items-center'>  
+        <div className='space-y-2'>
+      <h2 className='text-3xl font-bold '>Transactions</h2>
+      <p className='text-sm font-medium text-gray-600'>view and manage all your transactions</p>
+      </div>
+      
+        <button onClick={()=>setOpenDialog(true)} className='flex justify-center items-center gap-2 bg-green-500 text-white px-3 py-2 shadow-md hover:bg-green-700 rounded-lg cursor-pointer'>
+          <PlusIcon className='w-6 h-6'/>
+          <span title='add transaction'>Transaction</span>
+        </button>
+      
+          <Dialog open={openDialog} onClose={()=>{setOpenDialog(false);setEditingTransaction(null)}} size="md">
+            <AddTransactionForm onClose={()=>setOpenDialog(false)} categories={category} onSave={editingTransaction ? handleUpdateTransaction : handleAddTransaction} editingData={editingTransaction}/>
+          </Dialog>
+        
+      </div> 
       <div className='flex justify-end gap-8'>
        <div className="relative w-1/3 ">
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
@@ -159,9 +209,9 @@ const handleFilter = (selectedCategory: string) => {
         </div>
 
         </div>
-          <TransactionTable data={filteredTransaction}/>
+          <TransactionTable data={filteredTransaction} onEdit={handleEdit}  onDelete={handleDeleteTransaction}/>
     </div>
   )
 }
 
-export default page
+export default Page

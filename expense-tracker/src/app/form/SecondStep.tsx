@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
+import { firestoreService } from "../lib/firestoreService";
 
 interface Category {
   name: string;
@@ -63,9 +64,14 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
 
     try {
       // 🔥 Save to Firestore
-      await updateDocument({
-        budgetCategories: categories, // field name inside Firestore doc
-      });
+      // await updateDocument({
+      //   budgetCategories: categories, // field name inside Firestore doc
+      const path=["users",user?.uid,"budgetCategories"];
+      //add each category asa seperate document
+      for(const cat of categories){
+        await firestoreService.addDocumentAtPath(path,cat)
+      }
+    
 
       console.log("✅ Step 2 Budget Data saved:", categories);
       onContinue(); // move to next step
