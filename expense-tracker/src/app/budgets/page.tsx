@@ -1,3 +1,4 @@
+"use client"
 import {
   CircleAlert,
   Plus,
@@ -5,8 +6,11 @@ import {
 } from "lucide-react";
 import React from "react";
 import KpiDataCard from "../components/kpiDataCard";
+import Dialog from "../components/Dialog";
+import AddBudget from "./AddBudget";
 
 const BudgetsPage = () => {
+  const [openDialog, setOpenDialog] = React.useState(false);
   const goals = [
     {
       name: "Food",
@@ -57,10 +61,14 @@ const BudgetsPage = () => {
         </div>
 
         {/* Add Goal Button */}
-        <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-sm transition-all">
+        <button
+          onClick={() => { setOpenDialog(true)}} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-sm transition-all">
           <Plus size={18} />
           <span>Add Budget</span>
         </button>
+        <Dialog open={openDialog} onClose={()=>setOpenDialog(false)} size="sm">
+          <AddBudget  onClose={()=>setOpenDialog(false)}  />
+        </Dialog>
       </div>
 
       {/* KPI Cards */}

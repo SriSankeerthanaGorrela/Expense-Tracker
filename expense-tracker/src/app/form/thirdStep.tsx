@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 import { useRouter } from "next/navigation"
+import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 type Goal = {
   id: number;
@@ -25,7 +26,7 @@ function ThirdStep() {
   ]);
 
   const { user } = useAuthStore();
-  const { updateDocument } = useFirestoreDocument(`users/${user?.uid}`);
+  const {addDocument } = useFirestoreCollection(`users/${user?.uid}/goals`);
   const router  = useRouter()
   // ✅ Handle goal field changes
   const handleGoalChange = (
@@ -57,8 +58,11 @@ function ThirdStep() {
     
 
     try {
-      await updateDocument({ goals,isNewuser:false });
+      for (const goal of goals) {
+        await addDocument(goal);
+      }
       alert("✅ Goals saved successfully!");
+      console.log("🆕 New Goals Added:", goals);
       setIsNewuser(false);
       router.push("/dashboard")
       

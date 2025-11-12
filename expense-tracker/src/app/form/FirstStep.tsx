@@ -36,7 +36,7 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
   });
  const { user,login } = useAuthStore();
   const userId = user?.uid;
-  const {doc:usersdatafirststep,updateDocument,loading}=useFirestoreDocument(`users/${userId}`)
+  const {updateDocument,loading}=useFirestoreDocument(`users/${userId}`)
   // ✅ Ensure `data` is strongly typed
   const onSubmit: SubmitHandler<FirstStepFormData> = async(data) => {
     console.log("Step 1 Data:", data);
