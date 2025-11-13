@@ -14,7 +14,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   data,
   onEdit,
   onDelete,
-}) => {  return (
+}) => {  
+  console.log("Transaction Data:", data);
+
+  return (
   <div className="w-full overflow-x-auto rounded-xl shadow-xl">
     {data.length === 0 ? (
       <div className="p-6 text-center text-gray-500 italic">
@@ -37,7 +40,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           {data.length > 0 ? (
             data.map((t) => (
               <tr
-                key={t.date}
+                key={t.id}
                 className="border-b divide-x divide-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-300">
