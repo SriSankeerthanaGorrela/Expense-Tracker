@@ -15,7 +15,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   onEdit,
   onDelete,
 }) => {  return (
-    <div className="w-full overflow-x-auto rounded-xl shadow-xl">
+  <div className="w-full overflow-x-auto rounded-xl shadow-xl">
+    {data.length === 0 ? (
+      <div className="p-6 text-center text-gray-500 italic">
+        No transactions available.
+      </div>
+    ) : (
       <table className="min-w-full text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900">
         <thead className=" bg-blue-400 text-white">
           <tr>
@@ -89,6 +94,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           )}
         </tbody>
       </table>
+    )}
     </div>
   );
 }

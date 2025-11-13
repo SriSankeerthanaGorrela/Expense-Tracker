@@ -5,6 +5,7 @@ import { BookOpen, Briefcase, Bus, Coffee, Film, Gift, HeartPulse, Home, PlusIco
 import Dialog from '../components/Dialog';
 import AddTransactionForm from './AddTransactionForm';
 import { recentTransactionType } from '../components/(share_types)/AllTypes';
+import { useFirestoreCollection } from '../lib/useFirestoreCollection';
 export const category=["Food & Dining","Shopping","Entertainment","Health","Gifts","Transportation","Home","Education",'Income']
 
 function Page() {
@@ -94,6 +95,7 @@ function Page() {
     amount: 45000.0,
   },
   ];
+  // const { docs }=useFirestoreCollection<recentTransactionType>(`users/${user?.uid}/transactions`)
   const[filteredTransaction,setFilteredTransaction]=useState(recentTransaction)
   const [search, setSearch] = useState("")
   const [categories,setCategories]=useState("All")
