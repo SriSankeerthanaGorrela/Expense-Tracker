@@ -8,7 +8,7 @@ import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 interface Category {
   name: string;
-  amount: number | "";
+  amount: number;
 }
 
 interface SecondStepProps {
@@ -17,12 +17,13 @@ interface SecondStepProps {
 
 const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
   const [categories, setCategories] = useState<Category[]>([
-    { name: "Food", amount: "" },
-    { name: "Shopping", amount: "" },
-    { name: "Hospitals", amount: "" },
-    { name: "EMIs", amount: "" },
-    { name: "Transport", amount: "" },
-    { name: "Bills", amount: "" },
+    { name: "Food", amount: 0 },
+    { name: "Shopping", amount: 0},
+    { name: "Hospitals", amount: 0 },
+    { name: "EMIs", amount: 0 },
+    {name:"Rent",amount:0},
+    { name: "Transport", amount: 0 },
+    { name: "Bills", amount: 0 },
   ]);
 
   const [newCategory, setNewCategory] = useState("");
@@ -33,7 +34,7 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
       (cat) => cat.name.toLowerCase() === newCategory.toLowerCase()
     );
     if (alreadyExists) return;
-    setCategories([...categories, { name: newCategory, amount: "" }]);
+    setCategories([...categories, { name: newCategory, amount: 0 }]);
     setNewCategory("");
   };
 
@@ -60,7 +61,7 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // stop page reload
     const hasEmpty = categories.some(
-      (cat) => cat.amount === "" || cat.amount === 0
+      (cat) => cat.amount === 0
     );
 
     if (hasEmpty) {

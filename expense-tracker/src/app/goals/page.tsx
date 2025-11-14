@@ -6,8 +6,13 @@ import CardStat from "../components/CardStat";
 import Dialog from "../components/Dialog";
 import AddGoalForm from "./addGoalForm";
 import { GoalCardProps } from "../components/(share_types)/AllTypes";
+import { useAuthStore } from "../store/authstore";
+import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 const GoalsPage = () => {
+  const { user } = useAuthStore();
+  const { docs: goalsdata } = useFirestoreCollection(`users/${user?.uid}/goals`);
+  console.log("Goals Data from Firestore:", goalsdata);
    const [goals, setGoals] = useState<GoalCardProps[]>([
     {
       id:"g1",
@@ -62,9 +67,9 @@ const GoalsPage = () => {
   setOpenDialog(false);
 };
 
-   const totalTarget = goals.reduce((sum, g) => sum + Number(g.target), 0);
-  const totalSaved = goals.reduce((sum, g) => sum + Number(g.current), 0);
-  const totalGoals=goals.length
+   const totalTarget = goalsdata.reduce((sum, g) => sum + Number(g.target), 0);
+  const totalSaved = goalsdata.reduce((sum, g) => sum + Number(g.current), 0);
+  const totalGoals=goalsdata.length
 
   return (
     <div className="p-6 min-h-screen space-y-6">

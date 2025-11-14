@@ -8,6 +8,8 @@ import React from "react";
 import KpiDataCard from "../components/kpiDataCard";
 import Dialog from "../components/Dialog";
 import AddBudget from "./AddBudget";
+import { useAuthStore } from "../store/authstore";
+import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 const BudgetsPage = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -48,7 +50,12 @@ const BudgetsPage = () => {
     if (percentage > 60) return "yellow";
     return "green";
   };
+  const { user } = useAuthStore();
+  const { docs: budget } = useFirestoreCollection(`users/${user?.uid}/budgetCategories`)
+  console.log(budget)
+ const totalBudget = budget.reduce((sum, item) => sum + (item.amount), 0);
 
+console.log("Total Budget:", totalBudget);
   return (
     <div className="p-6 min-h-screen space-y-6">
       {/* Header Section */}
@@ -75,7 +82,7 @@ const BudgetsPage = () => {
       <div className="grid grid-cols-3 gap-6">
         <KpiDataCard
           title="Total Budget"
-          value={40000}
+          value={totalBudget}
           icon={<TrendingUp className="text-green-500" />}
         />
         <KpiDataCard
