@@ -10,54 +10,7 @@ import { useAuthStore } from '../store/authstore';
 export const category=["Food & Dining","Shopping","Entertainment","Health","Gifts","Transportation","Home","Education",'Income']
 
 function Page() {
-  //    const recentTransaction:recentTransactionType[] = [
-  // {
-  //   id:"t1",
-  //   icon: <Coffee className="text-orange-500" />,
-  //   description: "Lunch at Restaurant",
-  //   category: "Food & Dining",
-  //   payment:"UPI",
-  //   date: "2025-11-03",
-  //   amount: -850.0,
-  // },
-  // {
-  //   id:"t2",
-  //   icon: <Briefcase className="text-green-600" />,
-  //   description: "Freelance Payment",
-  //   payment:"Bank",
-  //   category: "Income",
-  //   date: "2025-11-02",
-  //   amount: 5000.0,
-  // },
-  // {
-  //   id:"t3",
-  //   icon: <Film className="text-red-500" />,
-  //   description: "Netflix Subscription",
-  //    payment:"Card",
-  //   category: "Entertainment",
-  //   date: "2025-11-01",
-  //   amount: -499.0,
-  // },
-  // {
-  //   id:"t4",
-  //   icon: <ShoppingBag className="text-pink-500" />,
-  //   description: "Mall Shopping",
-  //    payment:"Cash",
-  //   category: "Shopping",
-  //   date: "2025-10-30",
-  //   amount: -3200.0,
-  // },
-  // { id:"t5",
-  //   icon: <Bus className="text-blue-500" />,
-  //   description: "Taxi Ride",
-  //    payment:"UPI",
-  //   category: "Transport",
-  //   date: "2025-10-29",
-  //   amount: -250.0,
-  // },
- 
-  // ];
-  // const { docs }=useFirestoreCollection<recentTransactionType>(`users/${user?.uid}/transactions`)
+  
  
   const [search, setSearch] = useState("")
   const [categories,setCategories]=useState("All")
@@ -66,8 +19,7 @@ function Page() {
 const {user}=useAuthStore();
 const{docs:recentTransaction,addDocument,updateDocument,deleteDocument}=useFirestoreCollection<recentTransactionType>(user?`users/${user.uid}/transactions` : "")
  const[filteredTransaction,setFilteredTransaction]=useState<recentTransactionType[]>(recentTransaction)
-// const{docs:Bcategories}=useFirestoreCollection(`users/${user?.uid}/budgetCategories`)
-// console.log("budget",Bcategories)
+
 useEffect(()=>{
   if(recentTransaction) setFilteredTransaction(recentTransaction)
 },[recentTransaction])

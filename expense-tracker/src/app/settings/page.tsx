@@ -6,10 +6,12 @@ import { useAuthStore } from "../store/authstore";
 import Updatepassword from "./Updatepassword";
 import { LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 
 function Page() {
   const [isEditing, setIsEditing] = useState(false);
-    const { user, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
+  const {doc:userInfo}=useFirestoreDocument(`users/${user?.uid}`);
     const router = useRouter();
   const handleLogout = async() => {
     logout()
@@ -44,7 +46,7 @@ function Page() {
             <label className="text-sm text-gray-600 mb-1">Full Name</label>
             <input
               type="text"
-              value={user?.name || ""}
+              value={userInfo?.name || ""}
               readOnly
               className="border border-gray-300 rounded-lg p-2 bg-gray-100 focus:outline-none"
             />
@@ -55,7 +57,7 @@ function Page() {
             <label className="text-sm text-gray-600 mb-1">Email Address</label>
             <input
               type="email"
-              value={user?.email || ""}
+              value={userInfo?.email || ""}
               readOnly
               className="border border-gray-300 rounded-lg p-2 bg-gray-100 focus:outline-none"
             />
@@ -66,7 +68,7 @@ function Page() {
             <label className="text-sm text-gray-600 mb-1">Monthly Income</label>
             <input
               type="number"
-              value={user?.income || ""}
+              value={userInfo?.income || ""}
               readOnly
               className="border border-gray-300 rounded-lg p-2 bg-gray-100 focus:outline-none "
             />
@@ -77,7 +79,7 @@ function Page() {
             <label className="text-sm text-gray-600 mb-1">Target Savings (%)</label>
             <input
               type="number"
-              value={user?.targetSavings || ""}
+              value={userInfo?.targetSavings || ""}
               readOnly
               className="border border-gray-300 rounded-lg p-2 bg-gray-100 focus:outline-none "
             />

@@ -1,10 +1,6 @@
-"use client"
-import {
-  CircleAlert,
-  Plus,
-  TrendingUp,
-} from "lucide-react";
+"use client";
 import React from "react";
+import { Plus, TrendingUp, CircleAlert } from "lucide-react";
 import KpiDataCard from "../components/kpiDataCard";
 import Dialog from "../components/Dialog";
 import AddBudget from "./AddBudget";
@@ -13,52 +9,84 @@ import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 const BudgetsPage = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
-  const goals = [
-    {
-      name: "Food",
-      spent: 2500,
-      limit: 3000,
-      percentage: 83,
-      message: "You're approaching your budget limit.",
-    },
-    {
-      name: "Shopping",
-      spent: 2800,
-      limit: 3000,
-      percentage: 93,
-      message: "Budget exceeded! Try to cut down expenses.",
-    },
-    {
-      name: "Medicines",
-      spent: 1200,
-      limit: 3000,
-      percentage: 40,
-      message: "You're within your budget.",
-    },
-    {
-      name: "Transport",
-      spent: 2100,
-      limit: 3000,
-      percentage: 70,
-      message: "You're approaching your limit.",
-    },
-  ];
+  const { user } = useAuthStore();
 
-  // Function to decide color category
+  // 📌 Fetch Budgets
+  const { docs: budgets } = useFirestoreCollection(
+    `users/${user?.uid}/budgetCategories`
+  );
+
+  // 📌 Fetch Transactions
+  const { docs: transactions } = useFirestoreCollection(
+    `users/${user?.uid}/transactions`
+  );
+
+  // ===============================
+  // 🔥 Calculate spending for each budget
+  // ===============================
+  const budgetsWithSpending = budgets.map((b) => {
+    const spent = transactions
+      .filter((t) => t.category === b.name)
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    const percentage = (spent / Number(b.amount)) * 100;
+    const safepercentage= percentage > 100 ? 100 : percentage;
+    return {
+      ...b,
+      spent,
+      percentage: Number(percentage.toFixed(2)),
+      safepercentage
+    };
+  });
+
+  // 📌 Calculate Total Budget (Sum of limits)
+  const totalBudget = budgets.reduce(
+    (sum, item) => sum + Number(item.amount),
+    0
+  );
+
+  // 📌 Total Spent across all categories
+  const totalSpent = budgetsWithSpending.reduce(
+    (sum, item) => sum + item.spent,
+    0
+  );
+
+  // 📌 Remaining = totalBudget - totalSpent
+  const remaining = totalBudget - totalSpent;
+
+  // ===============================
+  // 🎨 UI Color Logic Based on Percentage
+  // ===============================
   const getColorClass = (percentage: number) => {
-    if (percentage > 90) return "red";
-    if (percentage > 60) return "yellow";
+    if (percentage >= 90) return "red";
+    if (percentage >= 60) return "yellow";
     return "green";
   };
-  const { user } = useAuthStore();
-  const { docs: budget } = useFirestoreCollection(`users/${user?.uid}/budgetCategories`)
-  console.log(budget)
- const totalBudget = budget.reduce((sum, item) => sum + (item.amount), 0);
 
-console.log("Total Budget:", totalBudget);
+  const colorClasses = {
+    red: {
+      bar: "bg-red-500",
+      alertBg: "bg-red-50",
+      text: "text-red-600",
+      icon: "text-red-600",
+    },
+    yellow: {
+      bar: "bg-yellow-400",
+      alertBg: "bg-yellow-50",
+      text: "text-yellow-600",
+      icon: "text-yellow-600",
+    },
+    green: {
+      bar: "bg-green-500",
+      alertBg: "bg-green-50",
+      text: "text-green-600",
+      icon: "text-green-600",
+    },
+  };
+
   return (
     <div className="p-6 min-h-screen space-y-6">
-      {/* Header Section */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-semibold mb-1">Budget</h1>
@@ -67,14 +95,17 @@ console.log("Total Budget:", totalBudget);
           </p>
         </div>
 
-        {/* Add Goal Button */}
+        {/* Add Budget Button */}
         <button
-          onClick={() => { setOpenDialog(true)}} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-sm transition-all">
+          onClick={() => setOpenDialog(true)}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-sm transition-all"
+        >
           <Plus size={18} />
           <span>Add Budget</span>
         </button>
-        <Dialog open={openDialog} onClose={()=>setOpenDialog(false)} size="sm">
-          <AddBudget  onClose={()=>setOpenDialog(false)}  />
+
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} size="sm">
+          <AddBudget onClose={() => setOpenDialog(false)} />
         </Dialog>
       </div>
 
@@ -82,47 +113,26 @@ console.log("Total Budget:", totalBudget);
       <div className="grid grid-cols-3 gap-6">
         <KpiDataCard
           title="Total Budget"
-          value={totalBudget}
+          value={`₹${totalBudget}`}
           icon={<TrendingUp className="text-green-500" />}
         />
         <KpiDataCard
           title="Total Spent"
-          value={20000}
+          value={`₹${totalSpent}`}
           icon={<TrendingUp className="text-red-500" />}
         />
         <KpiDataCard
           title="Remaining"
-          value={20000}
+          value={`₹${remaining}`}
           icon={<TrendingUp className="text-blue-500" />}
         />
       </div>
 
-      {/* Goals Section */}
+      {/* Category Cards */}
       <section className="grid grid-cols-2 gap-8">
-        {goals.map((goal, index) => {
-          const color = getColorClass(goal.percentage);
-
-          // Tailwind color mappings
-          const colorClasses = {
-            red: {
-              bar: "bg-red-500",
-              alertBg: "bg-red-50",
-              text: "text-red-600",
-              icon: "text-red-600",
-            },
-            yellow: {
-              bar: "bg-yellow-400",
-              alertBg: "bg-yellow-50",
-              text: "text-yellow-600",
-              icon: "text-yellow-600",
-            },
-            green: {
-              bar: "bg-green-500",
-              alertBg: "bg-green-50",
-              text: "text-green-600",
-              icon: "text-green-600",
-            },
-          }[color];
+        {budgetsWithSpending.map((budget, index) => {
+          const color = getColorClass(budget.percentage);
+          const style = colorClasses[color];
 
           return (
             <div
@@ -131,31 +141,35 @@ console.log("Total Budget:", totalBudget);
             >
               {/* Header */}
               <div className="flex justify-between items-center">
-                <h2 className="font-semibold text-gray-800">{goal.name}</h2>
-                <p className={`font-semibold ${colorClasses.text}`}>
-                  {goal.percentage}%
+                <h2 className="font-semibold text-gray-800">{budget.name}</h2>
+                <p className={`font-semibold ${style.text}`}>
+                  {budget.percentage}%
                 </p>
               </div>
 
               {/* Spent vs Limit */}
               <p className="text-sm text-gray-600">
-                ₹{goal.spent} of ₹{goal.limit}
+                ₹{budget.spent} of ₹{budget.amount}
               </p>
 
               {/* Progress Bar */}
               <div className="bg-gray-200 rounded-full w-full h-2">
                 <div
-                  className={`h-2 rounded-full transition-all ${colorClasses.bar}`}
-                  style={{ width: `${goal.percentage}%` }}
+                  className={`h-2 rounded-full transition-all  ${style.bar}`}
+                  style={{ width: `${budget.safepercentage}%` }}
                 ></div>
               </div>
 
-              {/* Alert Message */}
+              {/* Alert */}
               <p
-                className={`py-3 px-2 rounded-xl flex items-center gap-2 text-sm ${colorClasses.alertBg} ${colorClasses.text}`}
+                className={`py-3 px-2 rounded-xl flex items-center gap-2 text-sm ${style.alertBg} ${style.text}`}
               >
-                <CircleAlert className={`w-4 h-4 ${colorClasses.icon}`} />
-                {goal.message}
+                <CircleAlert className={`w-4 h-4 ${style.icon}`} />
+                {budget.percentage >= 100
+                  ? "Budget exceeded!"
+                  : budget.percentage >= 90
+                  ? "You're approaching your budget limit."
+                  : "You're within your budget."}
               </p>
             </div>
           );

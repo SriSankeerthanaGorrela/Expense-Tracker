@@ -1,37 +1,36 @@
 import { useEffect, useState, useMemo } from "react";
-
 import { firestoreService, FirestoreDoc } from "./firestoreService";
 import { useAuthStore } from "../store/authstore";
+import { WhereFilterOp } from "firebase/firestore";
 
 export const useFirestoreCollection = <T = FirestoreDoc>(
   pathString: string,
-  filters?: unknown
+  filters?: { field: string; op: WhereFilterOp; value: unknown }[],
+  options?: { orderByField?: string; order?: "asc" | "desc"; limit?: number }
 ) => {
-  // const { user, loading: authLoading } = useAuth();
   const { user, isLoading: authLoading } = useAuthStore();
   const [docs, setDocs] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // stable path
   const path = useMemo(
     () => pathString.split("/").filter(Boolean),
     [pathString]
   );
 
-//   const stableFilters = useMemo(() => {
-//   return filters ? JSON.parse(JSON.stringify(filters)) : undefined;
-// }, [JSON.stringify(filters)]);
-const stableFilters = useMemo(() => {
-  return filters ? structuredClone(filters) : undefined;
-}, [filters]);
+  // Stable filters — memoized based on content
+  const stableFilters = useMemo(() => {
+    return filters && filters.length > 0 ? JSON.stringify(filters) : null;
+  }, [filters]);
 
+  // Stable options — memoized based on content
+  const stableOptions = useMemo(() => {
+    return options ? JSON.stringify(options) : null;
+  }, [options]);
 
   useEffect(() => {
     if (authLoading) return;
-
-    setDocs([]);
-    setError(null);
-    setLoading(true);
 
     if (!user) {
       setError("User not authenticated");
@@ -40,15 +39,18 @@ const stableFilters = useMemo(() => {
     }
 
     if (path.length % 2 === 0) {
-      const errMsg = `Invalid collection path: must have odd number of segments. Received: ${pathString}`;
-      console.error(errMsg);
-      setError(errMsg);
+      setError(`Invalid collection path: ${pathString}`);
       setLoading(false);
       return;
     }
 
+    setLoading(true);
+    setError(null);
+
     try {
-      // ✅ this is the only MAJOR CHANGE:
+      const parsedFilters = stableFilters ? JSON.parse(stableFilters) : undefined;
+      const parsedOptions = stableOptions ? JSON.parse(stableOptions) : undefined;
+
       const unsubscribe = firestoreService.listenDocumentsAtPath(
         path,
         (data) => {
@@ -56,44 +58,35 @@ const stableFilters = useMemo(() => {
           setLoading(false);
         },
         (err) => {
-          console.error("Firestore error:", err);
           setError(err.message || "Firestore subscription error");
           setLoading(false);
         },
-        stableFilters
+        parsedFilters,
+        parsedOptions
       );
 
       return () => unsubscribe();
     } catch (err) {
-      const error = err as Error;
-      console.error("Firestore subscription failed:", error);
-      setError(error.message || "Unknown Firestore error");
+      setError((err as Error).message);
       setLoading(false);
     }
-  }, [authLoading, user, pathString, path, stableFilters]);
+  }, [authLoading, user?.uid, pathString, stableFilters, stableOptions]);
 
+  // CRUD operations
   const addDocument = async (data: Record<string, unknown>) => {
     try {
       return await firestoreService.addDocumentAtPath(path, data);
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || "Failed to add document");
+      setError((err as Error).message);
       return null;
     }
   };
 
-  const updateDocument = async (
-    docId: string,
-    data: Record<string, unknown>
-  ) => {
+  const updateDocument = async (docId: string, data: Record<string, unknown>) => {
     try {
-      return await firestoreService.updateDocumentAtPath(
-        [...path, docId],
-        data
-      );
+      return await firestoreService.updateDocumentAtPath([...path, docId], data);
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || "Failed to update document");
+      setError((err as Error).message);
       return null;
     }
   };
@@ -102,8 +95,7 @@ const stableFilters = useMemo(() => {
     try {
       return await firestoreService.deleteDocumentAtPath([...path, docId]);
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || "Failed to delete document");
+      setError((err as Error).message);
       return null;
     }
   };

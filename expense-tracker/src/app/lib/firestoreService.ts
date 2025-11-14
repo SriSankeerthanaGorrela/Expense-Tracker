@@ -1,4 +1,3 @@
-
 import {
   collection,
   doc,
@@ -10,12 +9,15 @@ import {
   onSnapshot,
   query,
   where,
+  orderBy,
+  limit,
   WhereFilterOp,
   DocumentData,
   CollectionReference,
   DocumentReference,
   QueryConstraint,
   QueryDocumentSnapshot,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -24,61 +26,109 @@ export type FirestoreDoc = {
   [key: string]: unknown;
 };
 
-// Get Collection Reference (for collections - odd segments)
+// Get Collection Reference
 const getCollectionRef = (
   path: string[]
 ): CollectionReference<DocumentData> => {
   let ref: unknown = db;
+
   for (let i = 0; i < path.length; i += 2) {
     const col = path[i];
     const id = path[i + 1];
+
     if (id) {
       ref = doc(ref, col, id);
     } else {
       ref = collection(ref, col);
     }
   }
+
   return ref as CollectionReference<DocumentData>;
 };
 
-// Get Document Reference (for documents - even segments)
+// Get Document Reference
 const getDocumentRef = (path: string[]): DocumentReference<DocumentData> => {
   return doc(db, ...path);
 };
 
 export const firestoreService = {
-  // ========== COLLECTION OPERATIONS ==========
-
-  // Get all documents in a collection with optional filters
+  // ===========================================================
+  // 🔥 GET DOCUMENTS WITH FILTER + ORDERBY + LIMIT
+  // ===========================================================
   getDocumentsAtPath: async (
     path: string[],
-    filters: { field: string; op: WhereFilterOp; value: unknown }[] = []
+    filters: { field: string; op: WhereFilterOp; value: unknown }[] = [],
+    options?: {
+      orderByField?: string;
+      order?: "asc" | "desc";
+      limit?: number;
+    }
   ): Promise<FirestoreDoc[]> => {
     const colRef = getCollectionRef(path);
-    const constraints: QueryConstraint[] = filters.map((f) =>
-      where(f.field, f.op, f.value)
-    );
 
-    const q = constraints.length > 0 ? query(colRef, ...constraints) : colRef;
+    const constraints: QueryConstraint[] = [];
+
+    // Add filters
+    filters.forEach((f) => {
+      constraints.push(where(f.field, f.op, f.value));
+    });
+
+    // Add orderBy
+    if (options?.orderByField) {
+      constraints.push(orderBy(options.orderByField, options.order ?? "asc"));
+    }
+
+    // Add limit
+    if (options?.limit) {
+      constraints.push(limit(options.limit));
+    }
+
+    const q =
+      constraints.length > 0 ? query(colRef, ...constraints) : colRef;
+
     const snapshot = await getDocs(q);
+
     return snapshot.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({
       id: d.id,
       ...d.data(),
     }));
   },
 
-  // Listen to all documents in a collection (with optional filters)
+  // ===========================================================
+  // 🔥 REALTIME LISTENER WITH FILTER + ORDERBY + LIMIT
+  // ===========================================================
   listenDocumentsAtPath: (
     path: string[],
     callback: (docs: FirestoreDoc[]) => void,
     errorCallback?: (error: Error) => void,
-    filters: { field: string; op: WhereFilterOp; value: unknown }[] = []
+    filters: { field: string; op: WhereFilterOp; value: unknown }[] = [],
+    options?: {
+      orderByField?: string;
+      order?: "asc" | "desc";
+      limit?: number;
+    }
   ) => {
     const colRef = getCollectionRef(path);
-    const constraints: QueryConstraint[] = filters.map((f) =>
-      where(f.field, f.op, f.value)
-    );
-    const q = constraints.length > 0 ? query(colRef, ...constraints) : colRef;
+
+    const constraints: QueryConstraint[] = [];
+
+    // Add filters
+    filters.forEach((f) => {
+      constraints.push(where(f.field, f.op, f.value));
+    });
+
+    // Add orderBy
+    if (options?.orderByField) {
+      constraints.push(orderBy(options.orderByField, options.order ?? "asc"));
+    }
+
+    // Add limit
+    if (options?.limit) {
+      constraints.push(limit(options.limit));
+    }
+
+    const q =
+      constraints.length > 0 ? query(colRef, ...constraints) : colRef;
 
     const unsubscribe = onSnapshot(
       q,
@@ -100,19 +150,28 @@ export const firestoreService = {
     return unsubscribe;
   },
 
-  // Add document to collection
-  addDocumentAtPath: async (
-    path: string[],
-    data: DocumentData
-  ): Promise<FirestoreDoc> => {
-    const colRef = getCollectionRef(path);
-    const docRef = await addDoc(colRef, data);
-    return { id: docRef.id, ...data };
-  },
+  // ===========================================================
+  // 🔥 ADD DOCUMENT
+  // ===========================================================
+ addDocumentAtPath: async (
+  path: string[],
+  data: DocumentData
+): Promise<FirestoreDoc> => {
+  const colRef = getCollectionRef(path);
 
-  // ========== DOCUMENT OPERATIONS ==========
+  const docData = {
+    ...data,
+    createdAt: serverTimestamp(),   // ⭐ ALWAYS ADD createdAt
+  };
 
-  // Get single document
+  const docRef = await addDoc(colRef, docData);
+
+  return { id: docRef.id, ...docData };
+},
+
+  // ===========================================================
+  // 🔥 GET SINGLE DOCUMENT
+  // ===========================================================
   getDocumentAtPath: async (path: string[]): Promise<FirestoreDoc | null> => {
     const docRef = getDocumentRef(path);
     const snapshot = await getDoc(docRef);
@@ -123,7 +182,9 @@ export const firestoreService = {
     return null;
   },
 
-  // Listen to single document
+  // ===========================================================
+  // 🔥 LISTEN TO SINGLE DOCUMENT
+  // ===========================================================
   listenDocumentAtPath: (
     path: string[],
     callback: (doc: FirestoreDoc | null) => void,
@@ -149,7 +210,9 @@ export const firestoreService = {
     return unsubscribe;
   },
 
-  // Update document
+  // ===========================================================
+  // 🔥 UPDATE DOCUMENT
+  // ===========================================================
   updateDocumentAtPath: async (
     path: string[],
     data: DocumentData
@@ -159,7 +222,9 @@ export const firestoreService = {
     return { id: path[path.length - 1], ...data };
   },
 
-  // Delete document
+  // ===========================================================
+  // 🔥 DELETE DOCUMENT
+  // ===========================================================
   deleteDocumentAtPath: async (path: string[]): Promise<string> => {
     const docRef = getDocumentRef(path);
     await deleteDoc(docRef);

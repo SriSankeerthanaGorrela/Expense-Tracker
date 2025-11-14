@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Lock, LogIn, Mail, TrendingUp, UserPlus } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-
+import { serverTimestamp } from "firebase/firestore";
 export default function AuthForm({ value }: { value: string }) {
   const {
     register,
@@ -41,7 +41,7 @@ export default function AuthForm({ value }: { value: string }) {
           uid: user.uid,
           email: user.email,
           isNewuser: true, // 👈 new user
-          createdAt: new Date(),
+          createdAt: serverTimestamp(),
           name: "",
         });
 

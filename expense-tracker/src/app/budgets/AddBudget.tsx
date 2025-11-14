@@ -1,12 +1,15 @@
 "use client";
 import React, { useState } from "react";
+import { useAuthStore } from "../store/authstore";
+import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 function AddBudget({ onClose }) {
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
   });
-
+  const { user } = useAuthStore();  
+  const {docs:budgetsdata,addDocument}=useFirestoreCollection(`users/${user?.uid}/budgetCategories`);
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -14,9 +17,14 @@ function AddBudget({ onClose }) {
       alert("Please fill all fields");
       return;
     }
+    const newBudget = {
+      name: formData.name,
+      amount: Number(formData.amount),
+    }
+    addDocument(newBudget);
 
     console.log("🆕 New Budget Added:", formData);
-    // 🔹 Later you can add code to store this in Firestore under user's budget collection.
+   
 
     setFormData({ name: "", amount: "" }); // clear form after submit
     onClose(); // close dialog after adding
