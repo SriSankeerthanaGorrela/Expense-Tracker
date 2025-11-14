@@ -18,6 +18,7 @@ import {
   QueryConstraint,
   QueryDocumentSnapshot,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -153,21 +154,29 @@ export const firestoreService = {
   // ===========================================================
   // 🔥 ADD DOCUMENT
   // ===========================================================
- addDocumentAtPath: async (
+addDocumentAtPath: async (
   path: string[],
   data: DocumentData
 ): Promise<FirestoreDoc> => {
+
   const colRef = getCollectionRef(path);
 
+  // ⭐ Create document reference (gives auto ID)
+  const docRef = doc(colRef);
+
   const docData = {
+    id: docRef.id,              // ⭐ Store ID inside document
+    current: 0,                 // ⭐ Every goal starts with 0
+    createdAt: serverTimestamp(),
     ...data,
-    createdAt: serverTimestamp(),   // ⭐ ALWAYS ADD createdAt
   };
 
-  const docRef = await addDoc(colRef, docData);
+  // ⭐ Use setDoc so we can write custom ID into document
+  await setDoc(docRef, docData);
 
-  return { id: docRef.id, ...docData };
+  return docData;  // Already includes id
 },
+
 
   // ===========================================================
   // 🔥 GET SINGLE DOCUMENT

@@ -1,12 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { useAuthStore } from "../store/authstore";
-import { useFirestoreDocument } from "../lib/useFirestoreDocument";
-import { useRouter } from "next/navigation"
-import { useFirestoreCollection } from "../lib/useFirestoreCollection";
+import { useRouter } from "next/navigation";
+import { db } from "../lib/firebase";
+import { addDoc, updateDoc, collection, doc } from "firebase/firestore";
 
 type Goal = {
-  id: number;
+  id: string; // now string because Firestore doc IDs are strings
   goalName: string;
   goalType: string;
   targetAmount: number;
@@ -22,52 +22,80 @@ const goalOptions = [
 
 function ThirdStep() {
   const [goals, setGoals] = useState<Goal[]>([
-    { id: 1, goalName: "", goalType: "", targetAmount: 0 },
+    { id: "", goalName: "", goalType: "", targetAmount: 0 },
   ]);
 
-  const { user } = useAuthStore();
-  const {addDocument } = useFirestoreCollection(`users/${user?.uid}/goals`);
-  const router  = useRouter()
-  // ✅ Handle goal field changes
+  const { user, setIsNewuser } = useAuthStore();
+  const router = useRouter();
+
+  // -------------------------------
+  // HANDLE FIELD UPDATE
+  // -------------------------------
   const handleGoalChange = (
-    id: number,
+    index: number,
     field: keyof Goal,
     value: string | number
   ) => {
     setGoals((prev) =>
-      prev.map((goal) => (goal.id === id ? { ...goal, [field]: value } : goal))
+      prev.map((goal, i) =>
+        i === index ? { ...goal, [field]: value } : goal
+      )
     );
   };
 
-  // ✅ Add new goal
+  // -------------------------------
+  // ADD NEW GOAL
+  // -------------------------------
   const addGoal = () => {
     setGoals((prev) => [
       ...prev,
-      { id: Date.now(), goalName: "", goalType: "", targetAmount: 0 },
+      { id: "", goalName: "", goalType: "", targetAmount: 0 },
     ]);
   };
 
-  // ✅ Remove goal
-  const removeGoal = (id: number) => {
-    setGoals((prev) => prev.filter((goal) => goal.id !== id));
+  // -------------------------------
+  // REMOVE A GOAL
+  // -------------------------------
+  const removeGoal = (index: number) => {
+    setGoals((prev) => prev.filter((_, i) => i !== index));
   };
-  const { setIsNewuser }=useAuthStore()
-  // ✅ Submit form
+
+  // -------------------------------
+  // SUBMIT FORM
+  // -------------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!user?.uid) return alert("User not logged in");
 
     try {
       for (const goal of goals) {
-        await addDocument(goal);
+        // 1️⃣ Create new Firestore doc
+        const docRef = await addDoc(
+          collection(db, "users", user.uid, "goals"),
+          {
+            goalName: goal.goalName,
+            goalType: goal.goalType,
+            targetAmount: goal.targetAmount,
+            current: 0,
+          }
+        );
+
+        // 2️⃣ Save the doc ID inside the document
+        await updateDoc(
+          doc(db, "users", user.uid, "goals", docRef.id),
+          {
+            id: docRef.id,
+          }
+        );
       }
-      alert("✅ Goals saved successfully!");
-      console.log("🆕 New Goals Added:", goals);
+
+      alert("Goals saved successfully!");
       setIsNewuser(false);
-      router.push("/dashboard")
-      
+      router.push("/dashboard");
+
     } catch (error) {
-      console.error("Error updating goals:", error);
+      console.error("Error saving goals:", error);
     }
   };
 
@@ -82,23 +110,25 @@ function ThirdStep() {
 
       {goals.map((goal, index) => (
         <div
-          key={goal.id}
+          key={index}
           className="grid grid-cols-3 gap-3 items-center bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"
         >
+          {/* Goal Name */}
           <input
             type="text"
             placeholder="Goal Name"
             value={goal.goalName}
             onChange={(e) =>
-              handleGoalChange(goal.id, "goalName", e.target.value)
+              handleGoalChange(index, "goalName", e.target.value)
             }
             className="input-field"
           />
 
+          {/* Goal Type */}
           <select
             value={goal.goalType}
             onChange={(e) =>
-              handleGoalChange(goal.id, "goalType", e.target.value)
+              handleGoalChange(index, "goalType", e.target.value)
             }
             className="input-field"
           >
@@ -110,20 +140,22 @@ function ThirdStep() {
             ))}
           </select>
 
+          {/* Target Amount + Remove button */}
           <div className="flex items-center gap-2">
             <input
               type="number"
               placeholder="Target Amount (₹)"
               value={goal.targetAmount || ""}
               onChange={(e) =>
-                handleGoalChange(goal.id, "targetAmount", Number(e.target.value))
+                handleGoalChange(index, "targetAmount", Number(e.target.value))
               }
               className="input-field flex-1"
             />
+
             {index > 0 && (
               <button
                 type="button"
-                onClick={() => removeGoal(goal.id)}
+                onClick={() => removeGoal(index)}
                 className="text-red-500 hover:text-red-700 font-bold"
               >
                 ✕

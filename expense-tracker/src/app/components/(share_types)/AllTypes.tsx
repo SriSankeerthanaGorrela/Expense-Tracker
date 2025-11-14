@@ -10,7 +10,6 @@ export interface recentTransactionType{
 
 export interface GoalCardProps {
   id:string;
-  icon?: React.ReactNode;
   title: string;
   targetDate:string;
   current: number;

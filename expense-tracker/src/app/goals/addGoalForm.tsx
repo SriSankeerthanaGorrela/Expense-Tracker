@@ -1,142 +1,79 @@
 "use client";
+
 import React, { useState } from "react";
-import { GoalCardProps } from "../components/(share_types)/AllTypes";
 
-interface AddGoalFormType {
-  onClose: () => void;
-  onAddGoal:(goal:GoalCardProps)=>void
-  onSave:(goalUpdate:GoalCardProps)=>void
-  editGoal:GoalCardProps | null
-}
+const goalOptions = [
+  "Emergency Fund",
+  "Vacation",
+  "Education",
+  "Retirement",
+  "Other",
+];
 
-const AddGoalForm: React.FC<AddGoalFormType> = ({ onClose,onAddGoal,onSave,editGoal }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    current: "",
-    target: "",
-    date: "",
+export default function AddGoalDialog({ onClose, onSave }) {
+  const [form, setForm] = useState({
+    goalName: "",
+    goalType: "",
+    targetAmount: 0,
+    targetDate: "",
+    current: 0,
   });
-React.useEffect(() => {
-  if (editGoal) {
-    setFormData({
-      title: editGoal.title || "",
-      current: editGoal.current?.toString() || "",
-      target: editGoal.target?.toString() || "",
-      date: editGoal.targetDate || "",
-    });
-  } else {
-    setFormData({ title: "", current: "", target: "", date: "" });
-  }
-}, [editGoal]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-   
-      //Convert string inputs to numbers before passing to parent
-    const goal: GoalCardProps = {
-      title: formData.title,
-      current: Number(formData.current),
-      target: Number(formData.target),
-      targetDate: formData.date,
-      id:editGoal?.id || ""
-    };
-    
-    console.log("Goal added:", formData);
-   if (editGoal) {
-  onSave(goal); // call update function
-} else {
-  onAddGoal(goal); // call add function
-}
-onClose();
-  }
+  const handleChange = (field, value) => {
+    setForm({ ...form, [field]: value });
+  };
 
   return (
-    <div className="bg-white  p-6 rounded-lg shadow-lg w-full">
-      <h1 className="text-xl font-semibold mb-4 text-gray-800 ">
-        {editGoal ? "Edit Goal" : "Add Goal"}
-      </h1>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* Goal Title */}
-        <div className="space-y-1">
-          <label className="label">Goal Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Enter your goal..."
-            className="input-field w-full"
-            required
-          />
-        </div>
+    <div className="">
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-96 space-y-4">
 
-        {/* Target Amount */}
-        <div className="space-y-1">
-          <label className="label">Goal Amount</label>
-          <input
-            type="number"
-            name="target"
-            value={formData.target}
-            onChange={handleChange}
-            placeholder="Enter your amount..."
-            className="input-field w-full"
-            required
-          />
-        </div>
+        <h2 className="text-lg font-semibold">Add New Goal</h2>
 
-        {/* Target Date */}
-        <div className="space-y-1">
-          <label className="label">Target Date</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            placeholder="Enter target date..."
-            className="input-field w-full"
-          />
-        </div>
+        <input
+          className="input-field"
+          placeholder="Goal Name"
+          value={form.goalName}
+          onChange={(e) => handleChange("goalName", e.target.value)}
+        />
 
-        {/* Current Amount */}
-        <div className="space-y-1">
-          <label className="label">Current Amount</label>
-          <input
-            type="number"
-            name="current"
-            value={formData.current}
-            onChange={handleChange}
-            placeholder="Enter current amount..."
-            className="input-field w-full"
-          />
-        </div>
+        <select
+          className="input-field"
+          value={form.goalType}
+          onChange={(e) => handleChange("goalType", e.target.value)}
+        >
+          <option value="">Select Type</option>
+          {goalOptions.map((opt) => (
+            <option key={opt}>{opt}</option>
+          ))}
+        </select>
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-2 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
+        <input
+          type="number"
+          className="input-field"
+          placeholder="Target Amount"
+          value={form.targetAmount}
+          onChange={(e) => handleChange("targetAmount", +e.target.value)}
+        />
+
+        <input
+          type="date"
+          className="input-field"
+          value={form.targetDate}
+          onChange={(e) => handleChange("targetDate", e.target.value)}
+        />
+
+        <div className="flex justify-between pt-2">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
             Cancel
           </button>
           <button
-            type="submit"
-            className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => onSave(form)}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
           >
-           {editGoal ? "Update Goal" : "Add Goal"}
+            Save
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
-};
-
-export default AddGoalForm;
+}
