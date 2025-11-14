@@ -1,13 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 
 import { firestoreService, FirestoreDoc } from "./firestoreService";
-import { useAuth } from "./AuthContext";
 import { useAuthStore } from "../store/authstore";
 
 export const useFirestoreCollection = <T = FirestoreDoc>(
   pathString: string,
   filters?: unknown
 ) => {
+  // const { user, loading: authLoading } = useAuth();
   const { user, isLoading: authLoading } = useAuthStore();
   const [docs, setDocs] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
