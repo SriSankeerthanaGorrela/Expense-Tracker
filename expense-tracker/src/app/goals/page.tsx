@@ -312,8 +312,15 @@ import AddGoalDialog from "./addGoalForm";
 import AddMoneyDialog from "./AddMoney";
 import EditGoalDialog from "./EditGoal";
 import Dialog from "../components/Dialog";
-
-
+import { GoalCardProps } from "../components/(share_types)/AllTypes";
+import {
+  Target,
+  PiggyBank,
+  Wallet,
+  PlusCircle,
+  Pencil,
+  CalendarDays,
+} from "lucide-react";
 
 function Page() {
   const { user } = useAuthStore();
@@ -321,55 +328,76 @@ function Page() {
   const {
     docs: goalsdata,
     addDocument,
-    updateDocument
-  } = useFirestoreCollection(`users/${user?.uid}/goals`);
+    updateDocument,
+  } = useFirestoreCollection<GoalCardProps>(`users/${user?.uid}/goals`);
 
   const [openAddGoal, setOpenAddGoal] = useState(false);
   const [openAddMoney, setOpenAddMoney] = useState(false);
   const [openEditGoal, setOpenEditGoal] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState(null);
+  const [selectedGoal, setSelectedGoal] = useState<GoalCardProps | null>(null);
 
-  // Calculate KPIs
+  // KPI Calculations
   const totalGoals = goalsdata.length;
-  const totalTarget = goalsdata.reduce((sum, g) => sum + g.targetAmount, 0);
-  const totalSaved = goalsdata.reduce((sum, g) => sum + g.current, 0);
+  const totalTarget = goalsdata.reduce((sum, g) => sum + Number(g.targetAmount || 0), 0);
+  const totalSaved = goalsdata.reduce((sum, g) => sum + Number(g.current || 0), 0);
 
   const openAddGoalDialog = () => setOpenAddGoal(true);
 
-  const openAddMoneyDialog = (goal: any) => {
+  const openAddMoneyDialog = (goal: GoalCardProps) => {
     setSelectedGoal(goal);
     setOpenAddMoney(true);
   };
 
-  const openEditGoalDialog = (goal: any) => {
+  const openEditGoalDialog = (goal: GoalCardProps) => {
     setSelectedGoal(goal);
     setOpenEditGoal(true);
   };
 
   return (
-    <div className="p-6 space-y-6">
-
-      {/* KPI Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <KpiDataCard title="Total Goals" value={totalGoals} icon={<></>} />
-        <KpiDataCard title="Total Target" value={totalTarget} icon={<></>} />
-        <KpiDataCard title="Total Saved" value={totalSaved} icon={<></>} />
-      </section>
+    <div className="p-4 space-y-8">
+      {/* Heading Section */}
+      <div className="flex items-center justify-between">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">Your Financial Goals</h1>
+        <p className="text-gray-500 text-sm">
+          Track your savings progress, set new targets, and stay motivated.
+        </p>
+      </header>
 
       {/* Add Goal Button */}
       <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 font-medium shadow rounded-lg hover:bg-blue-700 transition"
         onClick={openAddGoalDialog}
       >
-        ➕ Add Goal
+        <PlusCircle className="w-5 h-5" />
+        Add Goal
       </button>
+</div>
+      {/* KPI Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <KpiDataCard
+          title="Total Goals"
+          value={totalGoals}
+          icon={<Target className="w-6 h-6 text-blue-600" />}
+        />
+        <KpiDataCard
+          title="Total Target"
+          value={totalTarget}
+          icon={<PiggyBank className="w-6 h-6 text-green-600" />}
+        />
+        <KpiDataCard
+          title="Total Saved"
+          value={totalSaved}
+          icon={<Wallet className="w-6 h-6 text-amber-600" />}
+        />
+      </section>
 
-      {/* GOALS LIST */}
-      <div className="space-y-5">
+      {/* Goals List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {goalsdata.map((goal) => {
           const current = goal.current || 0;
           const progress = Math.min(
-            Math.round((current / goal.targetAmount) * 100),
+            Math.round((Number(current) / Number(goal.targetAmount)) * 100),
             100
           );
 
@@ -381,25 +409,32 @@ function Page() {
           return (
             <div
               key={goal.id}
-              className="p-5 bg-white dark:bg-gray-800 rounded-xl shadow-md border"
+              className="p-5 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 space-y-4"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div>
+              {/* Top Section */}
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col justify-between">
                   <h2 className="font-semibold text-lg">{goal.goalName}</h2>
+
+                 
                   <p className="text-sm text-gray-500">
-                    {daysLeft} days left
+                    Target Date:{" "}
+                    <span className="font-medium">{goal.targetDate}</span>
                   </p>
-                  <p className="text-sm text-gray-500">
-                    Target Date: <span className="font-medium">{goal.targetDate}</span>
-                  </p>
+                   <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
+                    <CalendarDays className="w-4 h-4" />
+                    <span>{daysLeft} days left</span>
+                  </div>
+
                 </div>
+
                 <span className="text-sm font-semibold text-green-600">
                   {progress}%
                 </span>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div
                   className="bg-green-500 h-2 rounded-full"
                   style={{ width: `${progress}%` }}
@@ -407,29 +442,32 @@ function Page() {
               </div>
 
               {/* Amount Section */}
-              <div className="flex justify-between border-b pb-3 mb-4">
+              <div className="flex justify-between border-b pb-3">
                 <div>
-                  <p>Current</p>
+                  <p className="text-sm text-gray-600">Current</p>
                   <p className="font-semibold">₹{current}</p>
                 </div>
                 <div>
-                  <p>Target</p>
+                  <p className="text-sm text-gray-600">Target</p>
                   <p className="font-semibold">₹{goal.targetAmount}</p>
                 </div>
               </div>
 
-              {/* ACTION BUTTONS */}
-              <div className="flex justify-between">
+              {/* Buttons */}
+              <div className="flex justify-between items-center">
                 <button
                   onClick={() => openAddMoneyDialog(goal)}
-                  className="bg-green-500 text-white px-8 py-2 rounded-lg"
+                  className="bg-green-500 flex items-center gap-2 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition"
                 >
+                  <Wallet className="w-4 h-4" />
                   Add Money
                 </button>
+
                 <button
                   onClick={() => openEditGoalDialog(goal)}
-                  className="text-gray-600 hover:underline"
+                  className="text-gray-600 hover:underline flex items-center gap-2"
                 >
+                  <Pencil className="w-4 h-4" />
                   Edit Goal
                 </button>
               </div>
@@ -437,35 +475,52 @@ function Page() {
           );
         })}
       </div>
+
+      {/* Dialogs */}
       <Dialog open={openAddGoal} size="md" onClose={() => setOpenAddGoal(false)}>
         <AddGoalDialog
           onClose={() => setOpenAddGoal(false)}
-          onSave={(goalData) => addDocument(goalData)}
+          onSave={async (goalData) => {
+  await addDocument({
+    ...goalData,
+    current: Number(goalData.current || 0),
+    targetAmount: Number(goalData.targetAmount || 0)
+  });
+  setOpenAddGoal(false);
+}}
+
         />
- </Dialog>
-      {/* Dialogs */}
-      <Dialog open={openAddMoney} size="sm" onClose={() => setOpenAddMoney(false)}>
-        <AddMoneyDialog
-          goal={selectedGoal}
-          onClose={() => setOpenAddMoney(false)}
-          onSave={(amount) =>
-            updateDocument(selectedGoal.id, {
-              current: selectedGoal.current + amount,
-         
-            })
-              
-  
-          } />
-        </Dialog>
-      <Dialog open={openEditGoal} onClose={() => setOpenEditGoal(false)}  >
- <EditGoalDialog
-          goal={selectedGoal}
-          onClose={() => setOpenEditGoal(false)}
-          onSave={(updatedData) =>
-            updateDocument(selectedGoal.id, updatedData)
-          } />
       </Dialog>
 
+      <Dialog open={openAddMoney} size="sm" onClose={() => {setOpenAddMoney(false);setSelectedGoal(null);}}>
+  <AddMoneyDialog
+    goal={selectedGoal!}
+    onClose={() => { setOpenAddMoney(false);setSelectedGoal(null);}}
+    onSave={(amount) => {
+      updateDocument(selectedGoal!.id, {
+        current: (selectedGoal?.current ?? 0) + amount,
+      });
+      setOpenAddMoney(false)
+      setSelectedGoal(null); 
+    }}
+  />
+</Dialog>
+
+
+      <Dialog open={openEditGoal} size="sm" onClose={() => setOpenEditGoal(false)}>
+        <EditGoalDialog
+          goal={selectedGoal!}
+          onClose={() => setOpenEditGoal(false)}
+         onSave={(updated) =>
+  updateDocument(selectedGoal!.id, {
+    ...updated,
+    current: Number(updated.current || 0),
+    targetAmount: Number(updated.targetAmount || 0)
+  })
+}
+
+        />
+      </Dialog>
     </div>
   );
 }
