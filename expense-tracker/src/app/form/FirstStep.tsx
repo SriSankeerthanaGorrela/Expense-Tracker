@@ -8,7 +8,7 @@ import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 // ✅ Type for your form fields
 type FirstStepFormData = {
   name: string;
-  email: string;
+  occupation: string;
   income: number;
   targetSavings: number;
 };
@@ -28,7 +28,7 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
   } = useForm<FirstStepFormData>({
     defaultValues: {
       name: "",
-      email: "",
+      occupation:"",
       income: 0,
       targetSavings: 0,
     },
@@ -70,18 +70,18 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
 
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Email
-        </label>
+        Occupation
+        </label> 
         <input
-          type="email"
-          {...register("email")} 
-          placeholder="Enter your email"
+          type="text"
+          {...register("occupation")} 
+          placeholder="Enter your occupation"
           className="input-field"
-          readOnly
-          value={user?.email || ""}
+        
+         
         />
-        {errors.email && (
-          <p className="text-red-500 text-sm">{errors.email.message}</p>
+        {errors.occupation && (
+          <p className="text-red-500 text-sm">{errors.occupation.message}</p>
         )}
       </div>
 

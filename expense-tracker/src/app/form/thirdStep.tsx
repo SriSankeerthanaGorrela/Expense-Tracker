@@ -87,10 +87,12 @@ function ThirdStep() {
           doc(db, "users", user.uid, "goals", docRef.id),
           {
             id: docRef.id,
-          }
+          },
         );
       }
-
+  await updateDoc(doc(db, "users", user.uid), {
+      isNewuser: false,
+    });
       alert("Goals saved successfully!");
       setIsNewuser(false);
       router.push("/dashboard");
