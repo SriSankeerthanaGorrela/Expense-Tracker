@@ -143,12 +143,16 @@ export default function AuthForm({ value }: { value: string }) {
               type="password"
               placeholder="Password"
               {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
-              })}
+  required: "Password is required",
+  minLength: {
+    value: 6,
+    message: "Password must be at least 6 characters",
+  },
+  pattern: {
+    value: /^(?=.*[A-Z])(?=.*[!@#$&*]).+$/,
+    message: "Password must include 1 uppercase letter and 1 special character",
+  },
+})}
               className="input-field"
             />
             {errors.password && (

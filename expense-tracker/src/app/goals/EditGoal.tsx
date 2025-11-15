@@ -13,6 +13,7 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
     targetAmount: 0,
     goalType: "",
     targetDate: "",
+    current:0
   });
 
   useEffect(() => {
@@ -22,6 +23,7 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
         targetAmount: Number(goal.targetAmount ?? 0),
         goalType: goal.goalType ?? "",
         targetDate: goal.targetDate ?? "",
+        current: Number(goal.current ?? 0)
       });
     }
   }, [goal]);
@@ -46,6 +48,12 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
           value={form.targetAmount}
           onChange={(e) => handleChange("targetAmount", Number(e.target.value) || 0)}
         />
+ <input
+          type="number"
+          className="input-field"
+          value={form.current}
+          onChange={(e) => handleChange("current", Number(e.target.value) || 0)}
+        />
 
         <input
           type="date"
@@ -59,7 +67,10 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
             Cancel
           </button>
           <button
-            onClick={() => onSave(form)}
+            onClick={() => {
+              onSave(form);
+              onClose();
+            }}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Update

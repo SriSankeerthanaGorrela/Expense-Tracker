@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/authstore";
 import { useRouter } from "next/navigation";
 import { db } from "../lib/firebase";
 import { addDoc, updateDoc, collection, doc } from "firebase/firestore";
+import { Plus, Shell, X } from "lucide-react";
 
 type Goal = {
   id: string; // now string because Firestore doc IDs are strings
@@ -104,8 +105,8 @@ function ThirdStep() {
       onSubmit={handleSubmit}
       className="dark:bg-gray-900 p-4 rounded-xl space-y-4"
     >
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-        🎯 Financial Goals
+      <h2 className="text-lg font-semibold flex gap-3  text-gray-800 dark:text-gray-200">
+        <Shell /> Financial Goals
       </h2>
 
       {goals.map((goal, index) => (
@@ -158,7 +159,7 @@ function ThirdStep() {
                 onClick={() => removeGoal(index)}
                 className="text-red-500 hover:text-red-700 font-bold"
               >
-                ✕
+               <X />
               </button>
             )}
           </div>
@@ -169,9 +170,9 @@ function ThirdStep() {
         <button
           type="button"
           onClick={addGoal}
-          className="btn-primary px-4 py-2 rounded-lg"
+          className="btn-primary flex gap-2 px-4 py-2 rounded-lg"
         >
-          ➕ Add Goal
+        <Plus/> Goal
         </button>
 
         <button type="submit" className="btn-primary px-6 py-2 rounded-lg">

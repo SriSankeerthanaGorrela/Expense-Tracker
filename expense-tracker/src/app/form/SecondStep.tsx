@@ -118,7 +118,6 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
                 type="number"
                 placeholder="Enter amount (₹)"
                 required
-                value={cat.amount}
                 onChange={(e) => handleAmountChange(cat.name, e.target.value)}
                 className="input-field flex-1"
               />

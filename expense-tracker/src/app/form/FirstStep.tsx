@@ -3,7 +3,6 @@ import { HandCoins } from "lucide-react";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuthStore } from "../store/authstore";
-import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 
 // ✅ Type for your form fields
@@ -75,9 +74,11 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
         </label>
         <input
           type="email"
-          {...register("email", { required: "Email is required" })}
+          {...register("email")} 
           placeholder="Enter your email"
           className="input-field"
+          readOnly
+          value={user?.email || ""}
         />
         {errors.email && (
           <p className="text-red-500 text-sm">{errors.email.message}</p>

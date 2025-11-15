@@ -22,7 +22,6 @@ export default function AddMoneyDialog({ goal, onClose, onSave } :AddMoneyDialog
           type="number"
           className="input-field"
           placeholder="Amount"
-          value={amount}
           onChange={(e) => setAmount(Number(e.target.value || 0))}
         />
 
