@@ -1,21 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
-
-export default function EditGoalDialog({ goal, onClose, onSave }) {
-  const [form, setForm] = useState({
-    goalName: goal.goalName,
-    targetAmount: goal.targetAmount,
-    goalType: goal.goalType,
-    targetDate: goal.targetDate,
+import React, { useEffect, useState } from "react";
+import { EditGoalInput, GoalCardProps } from "../components/(share_types)/AllTypes";
+interface EditGoalTypeProps{
+  goal:GoalCardProps;
+  onClose:()=>void;
+  onSave:(updatedGoal:Partial<EditGoalInput>)=>void
+}
+export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypeProps) {
+  const [form, setForm] = useState<EditGoalInput>({
+    goalName: "",
+    targetAmount: 0,
+    goalType: "",
+    targetDate: "",
   });
 
-  const handleChange = (field, value) =>
+  useEffect(() => {
+    if (goal) {
+      setForm({
+        goalName: goal.goalName ?? "",
+        targetAmount: Number(goal.targetAmount ?? 0),
+        goalType: goal.goalType ?? "",
+        targetDate: goal.targetDate ?? "",
+      });
+    }
+  }, [goal]);
+
+  const handleChange = (field: keyof EditGoalInput, value:string | number) =>
     setForm({ ...form, [field]: value });
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-96 space-y-4">
+    <div className="flex justify-center items-center">
+      <div className="p-6 rounded-xl w-96 space-y-4">
         <h2 className="text-lg">Edit Goal</h2>
 
         <input
@@ -28,13 +44,13 @@ export default function EditGoalDialog({ goal, onClose, onSave }) {
           type="number"
           className="input-field"
           value={form.targetAmount}
-          onChange={(e) => handleChange("targetAmount", +e.target.value)}
+          onChange={(e) => handleChange("targetAmount", Number(e.target.value) || 0)}
         />
 
         <input
           type="date"
           className="input-field"
-          value={form.targetDate}
+          value={form.targetDate || ""}
           onChange={(e) => handleChange("targetDate", e.target.value)}
         />
 

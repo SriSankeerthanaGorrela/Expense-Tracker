@@ -10,10 +10,16 @@ export interface recentTransactionType{
 
 export interface GoalCardProps {
   id:string;
-  title: string;
+  goalName: string;
+  goalType?:string
   targetDate:string;
   current: number;
-  target: number;
+  targetAmount: number;
   onAddMoney?: () => void;
   onEditGoal?: () => void;
 }
+export type NewGoalInput = Omit<GoalCardProps, "id">;
+// type for updating a goal (id is not updated)
+export type EditGoalInput = Omit<GoalCardProps, "id" | "current"> & {
+  current?: number; // optional, if you want to allow editing
+};

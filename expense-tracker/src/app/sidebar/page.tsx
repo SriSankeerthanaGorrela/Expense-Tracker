@@ -12,6 +12,9 @@ import {
   Wallet2,
   Settings,
   LogOut,
+  LucideTarget,
+  GoalIcon,
+  
 } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
 
@@ -19,7 +22,7 @@ const navItems = [
   { name: "Dashboard", icon: Home, path: "/dashboard" },
   { name: "Transactions", icon: List, path: "/transactions" },
   { name: "Budgets", icon: Target, path: "/budgets" },
-  { name: "Goals", icon: TargetIcon, path: "/goals" },
+  { name: "Goals", icon: GoalIcon, path: "/goals" },
   { name: "Analytics", icon: PieChart, path: "/analytics" },
   { name: "Settings", icon: Settings, path: "/settings" },
 
