@@ -25,6 +25,8 @@ import UpcomingBills from "./UpcomingBills";
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
+import { getCategoryTotals } from "./Monthlyexpenses";
+import getMonthlyExpenses from "./Monthlyexpenses";
 
 // ---------------- Mock Data ----------------
 export interface monthlyExpensesType {
@@ -35,15 +37,6 @@ export interface spendingByCategoryType {
   category: string;
   value: number;
 }
-
-const monthlyExpenses: monthlyExpensesType[] = [
-  { month: "Jan", expense: 2000 },
-  { month: "Feb", expense: 1500 },
-  { month: "Mar", expense: 1800 },
-  { month: "Apr", expense: 1000 },
-  { month: "May", expense: 1900 },
-  { month: "Jun", expense: 3000 },
-];
 
 const spendingByCategory: spendingByCategoryType[] = [
   { category: "Food", value: 2000 },
@@ -89,7 +82,8 @@ const { doc:userInfo, loading, error } = useFirestoreDocument(`users/${user?.uid
       </p>
     );
   }
-
+  const barpraphdata = getMonthlyExpenses(transactiondata);
+  const piechartdata=getCategoryTotals(transactiondata);
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-4">
@@ -120,8 +114,8 @@ const { doc:userInfo, loading, error } = useFirestoreDocument(`users/${user?.uid
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <StatGraph graph={monthlyExpenses} />
-        <SpendingByCategory category={spendingByCategory} />
+        <StatGraph graph={barpraphdata} />
+        <SpendingByCategory category={piechartdata} />
         <RecentTransaction recent={recentTransactions} />
         <UpcomingBills />
       </div>

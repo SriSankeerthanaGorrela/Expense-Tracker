@@ -85,18 +85,6 @@ const handleEdit = (transaction: recentTransactionType) => {
     setOpenDialog(false);
   };
 
-//     const handleDeleteTransaction = (id: string) => {
-//   if (confirm("Are you sure you want to delete this transaction?")) {
-
-//     //id="t2", filter runs like-> t1->"t1"!=="t2" ==> condition is true, we keep it
-//     //                            t2->"t2"!=="t2"==>condition is false , remove it
-//     setFilteredTransaction((prev) => prev.filter((t) => t.id !== id));
-//   }
-// };
-
- 
-
-
 const handleDeleteTransaction = async (id: string) => {
   if (confirm("Are you sure you want to delete this transaction?")) {
     await deleteDocument(id);

@@ -19,6 +19,7 @@ import {
   Pencil,
   CalendarDays,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 function Page() {
   const { user } = useAuthStore();
@@ -184,6 +185,7 @@ function Page() {
     current: Number(goalData.current || 0),
     targetAmount: Number(goalData.targetAmount || 0)
   });
+  toast.success("Goal added successfully!");
   setOpenAddGoal(false);
 }}
 
@@ -198,6 +200,7 @@ function Page() {
       updateDocument(selectedGoal!.id, {
         current: (selectedGoal?.current ?? 0) + amount,
       });
+      toast.success("Amount added to goal successfully!");
       setOpenAddMoney(false)
       setSelectedGoal(null); 
     }}
@@ -214,6 +217,8 @@ function Page() {
     ...updated,
     current: Number(updated.current || 0),
     targetAmount: Number(updated.targetAmount || 0)
+  }).then(() => {
+    toast.success("Goal updated successfully!");  // ⭐ ADD HERE
   })
 }
 

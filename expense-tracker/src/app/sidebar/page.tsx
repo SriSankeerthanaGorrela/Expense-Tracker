@@ -17,13 +17,14 @@ import {
   
 } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
+import toast from "react-hot-toast";
 
 const navItems = [
   { name: "Dashboard", icon: Home, path: "/dashboard" },
   { name: "Transactions", icon: List, path: "/transactions" },
   { name: "Budgets", icon: Target, path: "/budgets" },
   { name: "Goals", icon: GoalIcon, path: "/goals" },
-  { name: "Analytics", icon: PieChart, path: "/analytics" },
+  { name: "AI Insights", icon: PieChart, path: "/insights" },
   { name: "Settings", icon: Settings, path: "/settings" },
 
 ];
@@ -38,8 +39,9 @@ export function Sidebar() {
   const handleNav = (path: string) => {
     router.push(path);
   };
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     logout()
+   
     router.push('/login')
   }
 

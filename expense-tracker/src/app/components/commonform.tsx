@@ -10,6 +10,7 @@ import { Lock, LogIn, Mail, TrendingUp, UserPlus } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { serverTimestamp } from "firebase/firestore";
+import toast from "react-hot-toast";
 export default function AuthForm({ value }: { value: string }) {
   const {
     register,
@@ -46,13 +47,12 @@ export default function AuthForm({ value }: { value: string }) {
         });
 
         // 🔹 Save user to Zustand store
-       
 
         reset();
-       setTimeout(() => {
-    alert("User registered successfully!");
-    router.push("/login");
-  }, 300);
+        setTimeout(() => {
+          toast.success("User registered successfully!");
+          router.push("/login");
+        }, 300);
       } else {
         const userCredential = await signInWithEmailAndPassword(
           auth,
@@ -68,7 +68,6 @@ export default function AuthForm({ value }: { value: string }) {
           uid,
           email: userCredential.user.email,
           isNewuser: false,
-         
         };
 
         if (docSnap.exists()) {
@@ -77,12 +76,12 @@ export default function AuthForm({ value }: { value: string }) {
 
         login(userData);
         reset();
-        alert("Login successful!");
+        toast.success("Logged in successfully!");
         router.push("/dashboard");
       }
     } catch (err: any) {
       console.error(err);
-      alert(err.message);
+      toast.error(err.message || "Login Failed");
     }
   }
 
@@ -143,16 +142,17 @@ export default function AuthForm({ value }: { value: string }) {
               type="password"
               placeholder="Password"
               {...register("password", {
-  required: "Password is required",
-  minLength: {
-    value: 6,
-    message: "Password must be at least 6 characters",
-  },
-  pattern: {
-    value: /^(?=.*[A-Z])(?=.*[!@#$&*]).+$/,
-    message: "Password must include 1 uppercase letter and 1 special character",
-  },
-})}
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+                pattern: {
+                  value: /^(?=.*[A-Z])(?=.*[!@#$&*]).+$/,
+                  message:
+                    "Password must include 1 uppercase letter and 1 special character",
+                },
+              })}
               className="input-field"
             />
             {errors.password && (

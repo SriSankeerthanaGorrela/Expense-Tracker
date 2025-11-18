@@ -69,7 +69,7 @@ const SpendingByCategory = ({
                   boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                 }}
               />
-              <Legend
+              {/* <Legend
                 layout="vertical"
                 align="right"
                 verticalAlign="middle"
@@ -78,7 +78,7 @@ const SpendingByCategory = ({
                   paddingLeft: '20px',
                   fontSize: '13px',
                 }}
-              />
+              /> */}
             </PieChart>
           </ResponsiveContainer>
         </div>

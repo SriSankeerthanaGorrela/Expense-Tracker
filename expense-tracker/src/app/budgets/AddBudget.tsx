@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
+import toast from "react-hot-toast";
 
 function AddBudget({ onClose }) {
   const [formData, setFormData] = useState({
@@ -23,8 +24,7 @@ function AddBudget({ onClose }) {
     }
     addDocument(newBudget);
 
-    console.log("🆕 New Budget Added:", formData);
-   
+   toast.success("Budget added successfully!");
 
     setFormData({ name: "", amount: "" }); // clear form after submit
     onClose(); // close dialog after adding

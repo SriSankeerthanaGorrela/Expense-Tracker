@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ProtectedRoute } from "./protectedRoute";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,13 @@ export default function RootLayout({
       >
         <ProtectedRoute>
           {children}
+           <Toaster
+          position="top-right"
+          toastOptions={{
+            success: { duration: 2000 },
+            error: { duration: 3000 }
+          }}
+        />
           </ProtectedRoute>
       </body>
     </html>
