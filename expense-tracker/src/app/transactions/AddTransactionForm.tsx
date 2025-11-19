@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import { recentTransactionType } from "../components/(share_types)/AllTypes";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 import { useAuthStore } from "../store/authstore";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 interface AddTransactionFormTypeProp {
   onClose: () => void;
   categories: string[];
@@ -124,21 +126,38 @@ const {docs:budgetcategories}=useFirestoreCollection(`users/${user?.uid}/budgetC
         </select>
       </div>
         <div className="space-y-2">
-          <label className="label">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="input-field"
-          >
-              <option value="">Select category</option>
+  <label className="label">Category</label>
 
-            {budgetcategories.map((cat)=>(
-                
-                <option key={cat.id} value={cat.name}>{cat.name}</option>
-            ))}
-          </select>
-        </div>
+  {budgetcategories.length === 0 ? (
+    <div className="p-3 border rounded-md text-center text-gray-500">
+      <p>No categories found.</p>
+      <div className="w-full flex justify-center mt-4">
+      <Link
+        href="/budgets"
+        className="px-4 py-2 bg-blue-600 text-white rounded-md 
+                   flex items-center justify-center gap-2 
+                   hover:bg-blue-700 transition"
+      >
+        <Plus /> Add Category
+      </Link>
+    </div>
+    </div>
+  ) : (
+    <select
+      name="category"
+      value={formData.category}
+      onChange={handleChange}
+      className="input-field"
+    >
+      <option value="">Select category</option>
+
+      {budgetcategories.map((cat) => (
+        <option key={cat.id} value={cat.name}>{cat.name}</option>
+      ))}
+    </select>
+  )}
+</div>
+
 
         <div className="space-y-2">
             <label className="label">Date</label>
