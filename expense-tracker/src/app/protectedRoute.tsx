@@ -46,13 +46,13 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }, [isAuthenicated, isNewuser, isLoading, pathname, router]);
 
   // Loading state
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       Loading...
+  //     </div>
+  //   );
+  // }
 
   // Not logged in → Auth pages
   if (!isAuthenicated) {
