@@ -166,7 +166,7 @@ addDocumentAtPath: async (
 
   const docData = {
     id: docRef.id,              // ⭐ Store ID inside document
-    current: 0,                 // ⭐ Every goal starts with 0
+                   // ⭐ Every goal starts with 0
     createdAt: serverTimestamp(),
     ...data,
   };
