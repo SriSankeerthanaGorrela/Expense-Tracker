@@ -2,24 +2,46 @@
 
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useFirestoreCollection } from "../lib/useFirestoreCollection";
+import { useAuthStore } from "../store/authstore";
 
-const sampleWeeklyData = [
-  { day: "Mon", amount: 400 },
-  { day: "Tue", amount: 300 },
-  { day: "Wed", amount: 500 },
-  { day: "Thu", amount: 200 },
-  { day: "Fri", amount: 650 },
-  { day: "Sat", amount: 750 },
-  { day: "Sun", amount: 300 },
-];
+function getDayName(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", { weekday: "short" });
+}
 
-function WeeklyTrendChart() {
+function calculateDailySpending(transactions) {
+  const dailyTotals = {};
+
+  transactions.forEach(tx => {
+    const day = getDayName(tx.date);
+
+    if (!dailyTotals[day]) {
+      dailyTotals[day] = 0;
+    }
+
+    dailyTotals[day] += tx.amount;
+  });
+
+  const daysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  return daysOrder.map(day => ({
+    day,
+    amount: dailyTotals[day] || 0
+  }));
+}
+
+export default function WeeklyTrendChart() {
+  const {user} = useAuthStore();
+  const {docs:transactions} = useFirestoreCollection(`users/${user?.uid}/transactions`);
+  const chartData = calculateDailySpending(transactions);
+
   return (
-    <div className="card">
-      <h2 className="card-title">Weekly / Daily Spending Trend</h2>
+    <div className="p-8 bg-white rounded-xl shadow">
+      <h2 className="pb-4">Day Wise Spending Trend</h2>
 
       <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={sampleWeeklyData}>
+        <LineChart data={chartData}>
           <XAxis dataKey="day" />
           <YAxis />
           <Tooltip />
@@ -29,5 +51,3 @@ function WeeklyTrendChart() {
     </div>
   );
 }
-
-export default WeeklyTrendChart;

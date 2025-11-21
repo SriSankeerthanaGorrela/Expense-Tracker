@@ -50,7 +50,7 @@ const RecentTransaction = ({ recent }: { recent: Transaction[] }) => {
             Recent Transactions
           </h1>
           <button
-            className="text-green-600 hover:text-green-700 text-sm font-medium"
+            className="btn-primary text-sm font-medium"
             onClick={() => router.push("/transactions")}
           >
             View All

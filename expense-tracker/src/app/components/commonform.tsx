@@ -77,7 +77,7 @@ export default function AuthForm({ value }: { value: string }) {
         login(userData);
         reset();
         toast.success("Logged in successfully!");
-        router.push("/dashboard");
+        router.push("/auth-loading");
       }
     } catch (err: any) {
       console.error(err);

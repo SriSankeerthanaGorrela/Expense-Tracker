@@ -1,20 +1,19 @@
-import OpenAI from "openai";
+export async function getAIInsights(analyticsData: any) {
+  try {
+    const res = await fetch("/api/insights", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ analytics: analyticsData }),
+    });
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    if (!res.ok) throw new Error("API error");
 
-export async function getAIInsights(analytics) {
-  const prompt = `
-    You are a financial analyst. Analyze this data:
-    ${JSON.stringify(analytics)}
-
-    Provide 3 insights and a suggestion.
-    Keep it short.
-  `;
-
-  const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  return response.choices[0].message.content;
+    const data = await res.json();
+    return data.insights;
+  } catch (err) {
+    console.error("AI ERROR:", err);
+    return null;
+  }
 }
