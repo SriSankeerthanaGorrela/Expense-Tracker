@@ -108,7 +108,7 @@ const AddTransactionForm: React.FC<AddTransactionFormTypeProp> = ({
             className="input-field"
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <label className="label">Payment Method</label>
           <select
             name="payment"

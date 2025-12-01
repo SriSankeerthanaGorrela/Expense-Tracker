@@ -69,3 +69,8 @@
     0px 4px 8px -5px rgba(0, 0, 0, 0.15);
   @apply bg-white rounded-[12px];
 }
+.loader {
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+}

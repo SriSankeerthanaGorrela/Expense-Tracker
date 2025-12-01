@@ -1,20 +1,12 @@
-
 "use client";
 
 import React from "react";
-import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-} from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
 
 import KpiDataCard from "../components/kpiDataCard";
 import StatGraph from "./StatGraph";
 import SpendingByCategory from "./SpendingByCategory";
 import RecentTransaction from "./RecentTransaction";
-import UpcomingBills from "./UpcomingBills";
-
-
 
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 import { useAuthStore } from "../store/authstore";
@@ -26,7 +18,6 @@ import ErrorState from "../components/Error";
 import Fallback from "../components/Fallback";
 
 const DashboardPage = () => {
-
   const { user } = useAuthStore();
 
   // User document
@@ -48,18 +39,31 @@ const DashboardPage = () => {
     docs: recentTransactions,
     loading: recentLoading,
     error: recentError,
-  } = useFirestoreCollection(
-    `users/${user?.uid}/transactions`,
-    [],
-    {
-      orderByField: "createdAt",
-      order: "desc",
-      limit: 5,
-    }
-  );
+  } = useFirestoreCollection(`users/${user?.uid}/transactions`, [], {
+    orderByField: "createdAt",
+    order: "desc",
+    limit: 5,
+  });
 
+  const pageLoading = userLoading || transLoading || recentLoading;
 
-  
+  // ---------- SINGLE ERROR ----------
+  const pageError = userError || transError || recentError;
+
+  // SHOW LOADING
+  if (pageLoading) {
+    return (
+      <div className="flex justify-center items-center h-full py-20">
+        <Loader />
+      </div>
+    );
+  }
+
+  // SHOW ERROR
+  if (pageError) {
+    return <ErrorState message="Failed to load dashboard data." />;
+  }
+
   const totalExpenses = transactiondata.reduce((sum, t) => sum + t.amount, 0);
   const balanceamount = (userInfo?.income ?? 0) - totalExpenses;
 
@@ -68,80 +72,65 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-4">
-
-      {/* ---------- KPI CARDS ---------- */}
-    
-{userLoading || transLoading ? (
-  <div className="flex justify-center items-center">
-   
-    <Loader />
-  
-  </div>
-) : userError || transError ? (
-  <ErrorState message="Failed to load KPI data." />
-) : (
-  <div className="grid grid-cols-3 gap-4">
-    <KpiDataCard
-      title="Total Income"
-      value={userInfo?.income ?? "-"}
-      change="+12.5% from last month"
-      icon={<TrendingUp />}
-      changeIcon={<TrendingUp />}
-      type="positive"
-    />
-    <KpiDataCard
-      title="Total Expenses"
-      value={totalExpenses}
-      change="-8.2% from last month"
-      icon={<TrendingDown />}
-      changeIcon={<TrendingDown />}
-      type="negative"
-    />
-    <KpiDataCard
-      title="Balance"
-      value={balanceamount}
-      change="+15.3% from last month"
-      icon={<Wallet />}
-      changeIcon={<Wallet />}
-      type="positive"
-    />
-  </div>
-)}
-
+      <div className="grid grid-cols-3 gap-4">
+        <KpiDataCard
+          title="Total Income"
+          value={userInfo?.income ?? "-"}
+          change="+12.5% from last month"
+          icon={<TrendingUp />}
+          changeIcon={<TrendingUp />}
+          type="positive"
+        />
+        <KpiDataCard
+          title="Total Expenses"
+          value={totalExpenses}
+          change="-8.2% from last month"
+          icon={<TrendingDown />}
+          changeIcon={<TrendingDown />}
+          type="negative"
+        />
+        <KpiDataCard
+          title="Balance"
+          value={balanceamount}
+          change="+15.3% from last month"
+          icon={<Wallet />}
+          changeIcon={<Wallet />}
+          type="positive"
+        />
+      </div>
 
       {/* -------- Main Grid ------- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-
-         {/* --- Bar Graph --- */}
+        {/* --- Bar Graph --- */}
         {bargraphdata.length === 0 ? (
-          <Fallback message="No monthly data available to display the graph." buttonText="Add Transaction" href="/transactions" />
+          <Fallback
+            message="No monthly data available to display the graph."
+            buttonText="Add Transaction"
+            href="/transactions"
+          />
         ) : (
           <StatGraph graph={bargraphdata} />
         )}
 
         {/* --- Pie Chart --- */}
         {piechartdata.length === 0 ? (
-          <Fallback message="No category data available." buttonText="Add Budget" href="/budgets" />
+          <Fallback
+            message="No category data available."
+            buttonText="Add Budget"
+            href="/budgets"
+          />
         ) : (
           <SpendingByCategory category={piechartdata} />
         )}
 
         {/* Recent Transaction */}
-        
 
         {/* Upcoming Bills */}
         {/* <UpcomingBills /> */}
       </div>
       <div>
-        {recentLoading ? (
-          <Loader message="Fetching your latest transactions..." />
-        ) : recentError ? (
-          <ErrorState message="Failed to load recent transactions." />
-        ) : (
-          <RecentTransaction recent={recentTransactions} />
-        )}
+        <RecentTransaction recent={recentTransactions} />
       </div>
-
     </div>
   );
 };
