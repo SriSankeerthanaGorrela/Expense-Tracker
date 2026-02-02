@@ -147,11 +147,11 @@ export default function AuthForm({ value }: { value: string }) {
                   value: 6,
                   message: "Password must be at least 6 characters",
                 },
-                pattern: {
-                  value: /^(?=.*[A-Z])(?=.*[!@#$&*]).+$/,
-                  message:
-                    "Password must include 1 uppercase letter and 1 special character",
-                },
+                // pattern: {
+                //   value: /^(?=.*[A-Z])(?=.*[!@#$&*]).+$/,
+                //   message:
+                //     "Password must include 1 uppercase letter and 1 special character",
+                // },
               })}
               className="input-field"
             />
