@@ -21,7 +21,7 @@ export default function StepProgressCard() {
   
 
   return (
-    <div className="max-w-5xl mx-auto space-y-2 mt-5  bg-white dark:bg-gray-900 rounded-2xl shadow-md p-6">
+    <div className="max-w-5xl mx-auto space-y-2 mt-5  bg-white  rounded-2xl shadow-md p-6">
       <h2 className="text-3xl font-semibold  gradient-text">
        Welcome
       </h2>
@@ -30,16 +30,6 @@ export default function StepProgressCard() {
       <div className="flex justify-between items-center mb-6">
         {steps.map((step, index) => (
           <div key={step} className="flex items-center w-full">
-            {/* Circle */}
-            {/* <div
-              className={`w-8 h-8 flex items-center justify-center rounded-full font-semibold 
-              ${currentStep >= step ? " text-white" : "bg-gray-200 text-gray-600"}
-              transition-all duration-300`}
-            >
-              {step}
-            </div> */}
-             
-            {/* Line between circles (except after last step) */}
             {index < steps.length  && (
               <div className="flex-1 h-2 mx-2 bg-gray-200 rounded-full relative">
                 <div

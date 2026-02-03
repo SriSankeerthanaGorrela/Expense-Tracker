@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, {useState } from "react";
 import KpiDataCard from "../components/kpiDataCard";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
@@ -20,6 +20,8 @@ import {
   CalendarDays,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import GoalCompletedModal from "../components/CompletedModal";
+
 
 function Page() {
   const { user } = useAuthStore();
@@ -34,6 +36,10 @@ function Page() {
   const [openAddMoney, setOpenAddMoney] = useState(false);
   const [openEditGoal, setOpenEditGoal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<GoalCardProps | null>(null);
+  const [goalCompleted, setGoalCompleted] = useState(false);
+const [completedGoal, setCompletedGoal] = useState<GoalCardProps | null>(null);
+const [contributions, setContributions] = useState<unknown[]>([]);
+
 
   // KPI Calculations
   const totalGoals = goalsdata.length;
@@ -51,6 +57,10 @@ function Page() {
     setSelectedGoal(goal);
     setOpenEditGoal(true);
   };
+
+
+
+
 
   return (
     <div className="p-4 space-y-8">
@@ -90,25 +100,43 @@ function Page() {
           icon={<Wallet className="w-6 h-6 text-amber-600" />}
         />
       </section>
-
+ 
       {/* Goals List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {goalsdata.map((goal) => {
           const current = goal.current || 0;
           const progress = Math.min(
-            Math.round((Number(current) / Number(goal.targetAmount)) * 100),
+            Math.floor((Number(current) / Number(goal.targetAmount)) * 100),
             100
           );
+          const getDaysLeft = (targetDate: any) => {
+  if (!targetDate) return 0;
 
-          const daysLeft = Math.ceil(
-            (new Date(goal.targetDate).getTime() - Date.now()) /
-              (1000 * 60 * 60 * 24)
-          );
+  let dateObj: Date;
 
+  // 🔹 Case 1: Firestore Timestamp
+  if (targetDate?.seconds) {
+    dateObj = new Date(targetDate.seconds * 1000);
+  }
+  // 🔹 Case 2: Already Date object
+  else if (targetDate instanceof Date) {
+    dateObj = targetDate;
+  }
+  // 🔹 Case 3: String
+  else {
+    dateObj = new Date(targetDate);
+  }
+
+  if (isNaN(dateObj.getTime())) return 0;
+
+  return Math.ceil((dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+};
+
+          const daysLeft = getDaysLeft(goal.targetDate);
           return (
             <div
               key={goal.id}
-              className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 space-y-4"
+              className="p-8 bg-white rounded-xl shadow border border-gray-200  space-y-4"
             >
               {/* Top Section */}
               <div className="flex justify-between items-start">
@@ -133,7 +161,7 @@ function Page() {
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div className="w-full bg-gray-200  rounded-full h-2">
                 <div
                   className="bg-green-500 h-2 rounded-full"
                   style={{ width: `${progress}%` }}
@@ -154,13 +182,19 @@ function Page() {
 
               {/* Buttons */}
               <div className="flex justify-between items-center">
-                <button
-                  onClick={() => openAddMoneyDialog(goal)}
-                  className="btn-primary flex gap-3 items-center"
-                >
-                  <Wallet className="w-4 h-4" />
-                  Add Money
-                </button>
+               <button
+  onClick={() => {
+    if (goal.current >= goal.targetAmount) {
+      return toast.error("Goal already completed!");
+    }
+    openAddMoneyDialog(goal);
+  }}
+  className="btn-primary flex gap-3 items-center"
+>
+  <Wallet className="w-4 h-4" />
+  Add Money
+</button>
+
 
                 <button
                   onClick={() => openEditGoalDialog(goal)}
@@ -196,14 +230,42 @@ function Page() {
   <AddMoneyDialog
     goal={selectedGoal!}
     onClose={() => { setOpenAddMoney(false);setSelectedGoal(null);}}
+    // onSave={(amount) => {
+    //   updateDocument(selectedGoal!.id, {
+    //     current: (selectedGoal?.current ?? 0) + amount,
+    //   });
+    //   toast.success("Amount added to goal successfully!");
+    //   setOpenAddMoney(false)
+    //   setSelectedGoal(null); 
+    // }}
+
     onSave={(amount) => {
-      updateDocument(selectedGoal!.id, {
-        current: (selectedGoal?.current ?? 0) + amount,
-      });
-      toast.success("Amount added to goal successfully!");
-      setOpenAddMoney(false)
-      setSelectedGoal(null); 
-    }}
+  const newAmount = (selectedGoal?.current ?? 0) + amount;
+
+  // Update DB
+  updateDocument(selectedGoal!.id, { current: newAmount });
+
+  // SUCCESS MESSAGE
+  toast.success("Amount added to goal successfully!");
+
+  // CHECK IF GOAL COMPLETED
+  if (newAmount >= selectedGoal!.targetAmount) {
+    setGoalCompleted(true);
+    setCompletedGoal(selectedGoal!);
+
+    // Store contributions for download
+    const newEntry = {
+      date: new Date().toISOString(),
+      amount,
+      note: "Added to reach goal",
+    };
+    setContributions((prev) => [...prev, newEntry]);
+  }
+
+  setOpenAddMoney(false);
+  setSelectedGoal(null);
+}}
+
   />
 </Dialog>
 
@@ -224,6 +286,15 @@ function Page() {
 
         />
       </Dialog>
+      <GoalCompletedModal
+  isOpen={goalCompleted}
+  onClose={() => setGoalCompleted(false)}
+  goalName={completedGoal?.goalName || ""}
+  targetAmount={completedGoal?.targetAmount || 0}
+  completedAt={new Date().toLocaleDateString()}
+  contributions={contributions}
+/>
+
     </div>
   );
 }

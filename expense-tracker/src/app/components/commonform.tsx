@@ -6,11 +6,12 @@ import {
 import { useForm } from "react-hook-form";
 import { auth, db } from "../lib/firebase";
 import { useRouter } from "next/navigation";
-import { Lock, LogIn, Mail, TrendingUp, UserPlus } from "lucide-react";
+import { Eye, EyeOff, Lock, LogIn, Mail, TrendingUp, UserPlus } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { serverTimestamp } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { useState } from "react";
 export default function AuthForm({ value }: { value: string }) {
   const {
     register,
@@ -20,12 +21,14 @@ export default function AuthForm({ value }: { value: string }) {
   } = useForm({
     defaultValues: { email: "", password: "" },
   });
-
+const [loading, setLoading] = useState(false);
+const[show,setShow]=useState(false);
   const router = useRouter();
   const { login } = useAuthStore();
 
   async function onSubmit(data: any) {
     const { email, password } = data;
+    setLoading(true);
 
     try {
       if (value === "Register") {
@@ -49,10 +52,11 @@ export default function AuthForm({ value }: { value: string }) {
         // 🔹 Save user to Zustand store
 
         reset();
-        setTimeout(() => {
-          toast.success("User registered successfully!");
-          router.push("/login");
-        }, 300);
+      
+          toast.success("User registered successfully! Please login.");
+setTimeout(() => router.push("/login"), 800); 
+
+    
       } else {
         const userCredential = await signInWithEmailAndPassword(
           auth,
@@ -72,16 +76,22 @@ export default function AuthForm({ value }: { value: string }) {
 
         if (docSnap.exists()) {
           userData = { ...userData, ...docSnap.data() };
+          
         }
 
         login(userData);
         reset();
         toast.success("Logged in successfully!");
-        router.push("/auth-loading");
+        
+          router.push("/dashboard");
+        
       }
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Login Failed");
+      } catch (err: any) {
+  console.error("FULL ERROR:", err);
+  toast.error(err.message);
+
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -139,8 +149,10 @@ export default function AuthForm({ value }: { value: string }) {
           <div className="relative">
             <Lock className="absolute top-3 left-3 w-5 h-5 text-gray-400" />
             <input
-              type="password"
+              type={show?"text":"password"}
               placeholder="Password"
+                autoComplete="new-password"
+
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -155,6 +167,7 @@ export default function AuthForm({ value }: { value: string }) {
               })}
               className="input-field"
             />
+            <button type="button" className="right-3 absolute top-4 text-gray-700" onClick={() => setShow(!show)}> {show ? <EyeOff size={20}/> : <Eye size={20}/>} </button>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.password.message}
@@ -163,23 +176,31 @@ export default function AuthForm({ value }: { value: string }) {
           </div>
 
           {/* Submit */}
-          {value === "Login" ? (
-            <button
-              type="submit"
-              className="btn-primary flex gap-3 w-full items-center justify-center"
-            >
-              <LogIn />
-              Signin
-            </button>
-          ) : (
-            <button
-              type="submit"
-              className="btn-primary flex w-full  gap-3 justify-center "
-            >
-              <UserPlus />
-              Register
-            </button>
-          )}
+         <button
+  type="submit"
+  disabled={loading}
+  className={`btn-primary flex gap-3 w-full items-center justify-center ${
+    loading ? "opacity-60 cursor-not-allowed" : ""
+  }`}
+>
+  {loading ? (
+    <>
+      <span className="loader w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
+      Processing...
+    </>
+  ) : value === "Login" ? (
+    <>
+      <LogIn />
+      Signin
+    </>
+  ) : (
+    <>
+      <UserPlus />
+      Register
+    </>
+  )}
+</button>
+
         </form>
 
         {/* Switch Between Login/Register */}
@@ -203,4 +224,4 @@ export default function AuthForm({ value }: { value: string }) {
 //   uid: user.uid,      // unique Firebase identifier
 //   email: user.email,  // the login email
 // };
-// login(userData);      // store in Zustand
+// login(userData);      // store in Zustand 

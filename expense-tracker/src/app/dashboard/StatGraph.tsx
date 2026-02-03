@@ -2,16 +2,16 @@
 
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { monthlyExpensesType } from './page'
+
 
 const StatGraph = ({ graph }: { graph: monthlyExpensesType[] }) => {
   return (
     <div className="">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md p-4 space-y-5 border border-gray-200 dark:border-gray-700">
+      <div className="bg-white rounded-xl shadow-md p-4 space-y-5 border border-gray-200 ">
         
         {/* --- Header --- */}
-        <div className="flex items-center justify-between border-b pb-3 border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+        <div className="flex items-center justify-between border-b pb-3 border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-800 ">
             Monthly Expenses
           </h2>
           {/* <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">

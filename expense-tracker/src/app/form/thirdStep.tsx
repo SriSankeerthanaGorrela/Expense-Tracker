@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { db } from "../lib/firebase";
 import { addDoc, updateDoc, collection, doc } from "firebase/firestore";
 import { Plus, Shell, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 type Goal = {
   id: string; // now string because Firestore doc IDs are strings
@@ -25,6 +26,7 @@ function ThirdStep() {
   const [goals, setGoals] = useState<Goal[]>([
     { id: "", goalName: "", goalType: "", targetAmount: 0 },
   ]);
+const [loading, setLoading] = useState(false);
 
   const { user, setIsNewuser } = useAuthStore();
   const router = useRouter();
@@ -67,9 +69,10 @@ function ThirdStep() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user?.uid) return alert("User not logged in");
+    if (!user?.uid) return toast.error("User not logged in");
 
     try {
+      setLoading(true);
       for (const goal of goals) {
         // 1️⃣ Create new Firestore doc
         const docRef = await addDoc(
@@ -93,28 +96,34 @@ function ThirdStep() {
   await updateDoc(doc(db, "users", user.uid), {
       isNewuser: false,
     });
-      alert("Goals saved successfully!");
+      toast.success("Goals saved successfully!");
       setIsNewuser(false);
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 800);
+      
 
     } catch (error) {
       console.error("Error saving goals:", error);
+      toast.error("Failed to save goals. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="dark:bg-gray-900 p-4 rounded-xl space-y-4"
+      className=" p-4 rounded-xl space-y-4"
     >
-      <h2 className="text-lg font-semibold flex gap-3  text-gray-800 dark:text-gray-200">
+      <h2 className="text-lg font-semibold flex gap-3  text-gray-800 ">
         <Shell /> Financial Goals
       </h2>
 
       {goals.map((goal, index) => (
         <div
           key={index}
-          className="grid grid-cols-3 gap-3 items-center bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"
+          className="grid grid-cols-3 gap-3 items-center bg-gray-100  p-3 rounded-lg"
         >
           {/* Goal Name */}
           <input
@@ -177,8 +186,15 @@ function ThirdStep() {
         <Plus/> Goal
         </button>
 
-        <button type="submit" className="btn-primary px-6 py-2 rounded-lg">
-          Submit
+        <button type="submit" disabled={loading} className="btn-primary px-6 py-2 rounded-lg">
+          {loading ? (
+             <>
+      <span className="loader border-2 border-t-transparent border-white rounded-full w-4 h-4 animate-spin"></span>
+          Submitting...
+          </>
+          ) :(
+            "Submit"
+            )}
         </button>
       </div>
     </form>

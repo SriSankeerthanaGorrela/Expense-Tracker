@@ -51,10 +51,10 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4 gap-5 grid grid-cols-2 dark:bg-gray-900 p-4"
+      className="space-y-4 gap-5 grid grid-cols-2 p-4"
     >
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-gray-700 ">
           Full Name
         </label>
         <input
@@ -69,7 +69,7 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-gray-700 ">
         Occupation
         </label> 
         <input
@@ -86,7 +86,7 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-medium text-gray-700 ">
           Monthly Income (₹)
         </label>
         <input
@@ -104,7 +104,7 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
       </div>
 
       <div className="space-y-2">
-        <label className="flex gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="flex gap-2 text-sm font-medium text-gray-700 ">
         Target Savings (%)
         </label>
         <input

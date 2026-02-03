@@ -97,9 +97,9 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 dark:bg-gray-900 p-4 rounded-xl"
+      className="space-y-6  p-4 rounded-xl"
     >
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+      <h2 className="text-xl font-semibold text-gray-800 ">
         Set Your Budget Categories
       </h2>
 
@@ -108,10 +108,10 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
         {categories.map((cat) => (
           <div
             key={cat.name}
-            className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl shadow-sm"
+            className="flex items-center justify-between bg-gray-50  p-3 rounded-xl shadow-sm"
           >
             <div className="flex items-center gap-4 w-full">
-              <p className="font-medium text-gray-700 dark:text-gray-300 w-32">
+              <p className="font-medium text-gray-700  w-32">
                 {cat.name}
               </p>
               <input

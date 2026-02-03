@@ -46,7 +46,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-48 bg-white scroll-container dark:bg-slate-800 border-r overflow-y-auto border-slate-200 dark:border-slate-700 flex flex-col">
+    <aside className="w-48 bg-white scroll-container border-r overflow-y-auto border-slate-200  flex flex-col">
       {/* Main Nav */}
       <nav className="flex-1 px-2 py-4 space-y-2">
         {navItems.map((item) => {
@@ -59,7 +59,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors ${
                 active
                   ? "bg-teal-400 text-white"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  : "text-slate-600  hover:bg-slate-100 "
               }`}
             >
               <Icon size={20} />
@@ -76,7 +76,7 @@ export function Sidebar() {
        
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg">
+          className="flex items-center gap-3 w-full px-3 py-2 text-red-600 hover:bg-red-100  rounded-lg">
           <LogOut size={20} />
           <span>Logout</span>
         </button>

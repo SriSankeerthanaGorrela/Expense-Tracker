@@ -1,5 +1,4 @@
 
-
  const getMonthlyExpenses = (transactions) => {
   const monthlyTotals = {};
 

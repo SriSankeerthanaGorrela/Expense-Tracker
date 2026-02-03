@@ -24,7 +24,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         No transactions available.
       </div>
     ) : (
-      <table className="min-w-full text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900">
+      <table className="min-w-full text-sm text-gray-700  bg-white ">
         <thead className=" bg-blue-400 text-white">
           <tr>
             <th className="px-6 py-3 text-left">Date</th>
@@ -41,9 +41,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             data.map((t) => (
               <tr
                 key={t.id}
-                className="border-b divide-x divide-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="border-b divide-x divide-gray-200 border-gray-200  hover:bg-gray-50 transition-colors"
               >
-                <td className="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-gray-600 ">
                   {t.date}
                 </td>
 
@@ -57,7 +57,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 <td className="px-6 py-4">{t.description}</td>
 
                 <td className="px-6 py-4">
-                  <div className="flex items-center text-green-600 dark:text-green-400 font-semibold">
+                  <div className="flex items-center text-green-600 font-semibold">
                     <IndianRupee size={15} />
                     {t.amount}
                   </div>

@@ -34,9 +34,6 @@ const SpendingByCategory = ({
           <h2 className="text-lg font-semibold text-gray-800">
             Spending by Category
           </h2>
-          <button className="btn-primary text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-            Filter
-          </button>
         </div>
 
         {/* Pie Chart */}

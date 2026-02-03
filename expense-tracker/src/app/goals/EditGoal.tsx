@@ -33,21 +33,28 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
 
   return (
     <div className="flex justify-center items-center">
-      <div className="p-6 rounded-xl w-96 space-y-4">
-        <h2 className="text-lg">Edit Goal</h2>
-
+      <div className="p-6 rounded-xl w-96 space-y-4 ">
+        <h2 className="text-xl font-semibold">Edit Goal</h2>
+        <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-2">
+      <label className="label">Goal Name</label>
         <input
           className="input-field"
           value={form.goalName}
           onChange={(e) => handleChange("goalName", e.target.value)}
         />
-
+        </div>
+        <div className="space-y-2">
+      <label className="label">Goal Type</label>
         <input
           type="number"
           className="input-field"
           value={form.targetAmount}
           onChange={(e) => handleChange("targetAmount", Number(e.target.value) || 0)}
         />
+        </div>
+        <div className="space-y-2">
+      <label className="label">Target Amount</label>
  <input
           type="number"
           className="input-field"
@@ -55,14 +62,18 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
           onChange={(e) => handleChange("current", Number(e.target.value) || 0)}
         />
 
+        </div>
+        <div className="space-y-2">
+      <label className="label">Target Date</label>
         <input
           type="date"
           className="input-field"
           value={form.targetDate || ""}
           onChange={(e) => handleChange("targetDate", e.target.value)}
         />
-
-        <div className="flex justify-between">
+        </div>
+        </div>
+        <div className="flex gap-3  justify-center pt-4">
           <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">
             Cancel
           </button>
@@ -77,6 +88,7 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    
   );
 }

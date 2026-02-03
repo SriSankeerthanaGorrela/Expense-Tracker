@@ -24,20 +24,30 @@ const BudgetsPage = () => {
   // ===============================
   // 🔥 Calculate spending for each budget
   // ===============================
+  const now = new Date();
+const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const budgetsWithSpending = budgets.map((b) => {
-    const spent = transactions
-      .filter((t) => t.category === b.name)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+  const spent = transactions
+    .filter((t) => {
+      if (t.category !== b.name) return false;
 
-    const percentage = (spent / Number(b.amount)) * 100;
-    const safepercentage= percentage > 100 ? 100 : percentage;
-    return {
-      ...b,
-      spent,
-      percentage: Number(percentage.toFixed(2)),
-      safepercentage
-    };
-  });
+      const txnDate = new Date(t.date); // 🔥 make sure you store date in transaction
+      return txnDate >= firstDayOfMonth && txnDate <= lastDayOfMonth;
+    })
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+
+  const percentage = (spent / Number(b.amount)) * 100;
+  const safepercentage = percentage > 100 ? 100 : percentage;
+
+  return {
+    ...b,
+    spent,
+    percentage: Number(percentage.toFixed(2)),
+    safepercentage,
+  };
+});
+
 
   // 📌 Calculate Total Budget (Sum of limits)
   const totalBudget = budgets.reduce(
