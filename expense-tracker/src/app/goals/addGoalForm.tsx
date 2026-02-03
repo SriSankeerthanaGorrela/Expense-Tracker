@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { GoalCardProps, NewGoalInput } from "../components/(share_types)/AllTypes";
+import { NewGoalInput } from "../components/(share_types)/AllTypes";
 
 const goalOptions = [
   "Emergency Fund",

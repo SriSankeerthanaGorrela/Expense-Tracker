@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Transaction } from "../dashboard/RecentTransaction";
 import { Edit, IndianRupee, Trash } from "lucide-react";
 import { recentTransactionType } from "../components/(share_types)/AllTypes";
 

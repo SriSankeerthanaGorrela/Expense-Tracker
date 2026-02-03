@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
-import { useFirestoreDocument } from "../lib/useFirestoreDocument";
-import { firestoreService } from "../lib/firestoreService";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
 interface Category {
@@ -52,9 +50,7 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
   const { user } = useAuthStore();
   const uid = user?.uid;
    const {
-     addDocument,
-        loading,
-        error,
+     addDocument
       } = useFirestoreCollection(`users/${user?.uid}/budgetCategories`);
 
   // 🔹 Form submission

@@ -10,7 +10,7 @@ function AddBudget({ onClose }) {
     amount: "",
   });
   const { user } = useAuthStore();  
-  const {docs:budgetsdata,addDocument}=useFirestoreCollection(`users/${user?.uid}/budgetCategories`);
+  const {addDocument}=useFirestoreCollection(`users/${user?.uid}/budgetCategories`);
   const handleSubmit = (e) => {
     e.preventDefault();
 

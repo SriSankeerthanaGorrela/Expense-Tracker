@@ -12,7 +12,6 @@ interface AddTransactionFormTypeProp {
 }
 const AddTransactionForm: React.FC<AddTransactionFormTypeProp> = ({
   onClose,
-  categories,
   onSave,
   editingData,
 }) => {

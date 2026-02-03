@@ -2,18 +2,8 @@
 import React, { useEffect, useState } from "react";
 import TransactionTable from "./transactionTable";
 import {
-  BookOpen,
-  Briefcase,
-  Bus,
-  Coffee,
-  Film,
-  Gift,
-  HeartPulse,
-  Home,
   PlusIcon,
   Search,
-  ShoppingBag,
-  Wallet,
 } from "lucide-react";
 import Dialog from "../components/Dialog";
 import AddTransactionForm from "./AddTransactionForm";

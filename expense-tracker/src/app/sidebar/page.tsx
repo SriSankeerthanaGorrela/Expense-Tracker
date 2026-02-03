@@ -6,18 +6,13 @@ import {
   List,
   PieChart,
   Target,
-  FileText,
-  TargetIcon,
-  Tags,
-  Wallet2,
   Settings,
   LogOut,
-  LucideTarget,
   GoalIcon,
   
 } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
-import toast from "react-hot-toast";
+
 
 const navItems = [
   { name: "Dashboard", icon: Home, path: "/dashboard" },

@@ -8,7 +8,6 @@ import {
   ShoppingBag, // Shopping
   PiggyBank, // Savings
   Wallet, // Bills
-  Home, // Home
   Activity,
   HomeIcon,
   GiftIcon,
