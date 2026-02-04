@@ -6,7 +6,8 @@ import AuthLayout from "./(auth)/layout";
 import Login from "./(auth)/login/page";
 import Register from "./(auth)/register/page";
 import { Topbar } from "./Topbar/topbar";
-import { Sidebar } from "./sidebar/page";
+import Sidebar from "./sidebar/page";
+
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenicated, isLoading, isNewuser, checkAuth } = useAuthStore();
@@ -63,12 +64,12 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ✅ If user is on /form → show only the form, no layout
+  // If user is on /form → show only the form, no layout
   if (pathname === "/form") {
     return children;
   }
 
-  // ✅ Otherwise → show main app layout
+  // Otherwise → show main app layout
   return (
     <div className="antialiased h-screen flex flex-col">
       <Topbar />

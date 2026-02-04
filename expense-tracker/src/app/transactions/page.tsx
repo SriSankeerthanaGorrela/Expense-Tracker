@@ -6,21 +6,12 @@ import {
   Search,
 } from "lucide-react";
 import Dialog from "../components/Dialog";
-import AddTransactionForm from "./AddTransactionForm";
-import { recentTransactionType } from "../components/(share_types)/AllTypes";
+import AddTransactionForm, { category } from "./AddTransactionForm";
+import { Budget, recentTransactionType } from "../components/(share_types)/AllTypes";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 import { useAuthStore } from "../store/authstore";
-export const category = [
-  "Food & Dining",
-  "Shopping",
-  "Entertainment",
-  "Health",
-  "Gifts",
-  "Transportation",
-  "Home",
-  "Education",
-  "Income",
-];
+import { toJSDate } from "../dashboard/Monthlyexpenses";
+
 
 function Page() {
   const [search, setSearch] = useState("");
@@ -39,7 +30,7 @@ function Page() {
   );
   const [filteredTransaction, setFilteredTransaction] =
     useState<recentTransactionType[]>(recentTransaction);
-  const { docs: budgetcategories } = useFirestoreCollection(
+  const { docs: budgetcategories } = useFirestoreCollection<Budget>(
     user ? `users/${user.uid}/budgetCategories` : ""
   );
   console.log("budget categories in transaction page", budgetcategories);
@@ -52,7 +43,7 @@ function Page() {
     const result = recentTransaction.filter(
       (transaction) =>
         transaction.category.toLowerCase().includes(lowerQuery) ||
-        transaction.date.includes(lowerQuery) ||
+        toJSDate(transaction.date).toLocaleDateString().includes(lowerQuery) ||
         transaction.payment.toLowerCase().includes(lowerQuery) ||
         transaction.amount.toString().includes(lowerQuery)
     );
@@ -71,7 +62,8 @@ function Page() {
   };
 
   const handleAddTransaction = async (
-    newTransaction: recentTransactionType
+    //newTransaction: recentTransactionType
+    newTransaction:Omit<recentTransactionType,"id">
   ) => {
     //   //setFilteredTransaction((prev)=>[newTransaction, ...prev])
     await addDocument(newTransaction);
@@ -97,7 +89,10 @@ function Page() {
     updatedTransaction: recentTransactionType
   ) => {
     if (!updatedTransaction.id) return console.error("Missing ID for update");
-    await updateDocument(updatedTransaction.id, updatedTransaction);
+    // await updateDocument(updatedTransaction.id, updatedTransaction);
+    const { id, ...data } = updatedTransaction;
+await updateDocument(id, data);
+
     console.log("✅ Updated transaction");
     setFilteredTransaction((prev) =>
       prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t))
@@ -109,7 +104,7 @@ function Page() {
   const handleDeleteTransaction = async (id: string) => {
     if (confirm("Are you sure you want to delete this transaction?")) {
       await deleteDocument(id);
-      console.log("🗑️ Deleted transaction");
+      console.log(" Deleted transaction");
     }
   };
 

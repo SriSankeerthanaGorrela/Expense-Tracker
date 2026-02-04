@@ -13,6 +13,8 @@ import {
   GiftIcon,
   Train, // Other
 } from "lucide-react";
+import { recentTransactionType } from "../components/(share_types)/AllTypes";
+import { toJSDate } from "./Monthlyexpenses";
 
 export type Transaction = {
   icon?: React.ReactNode;
@@ -23,7 +25,7 @@ export type Transaction = {
   amount: number;
 };
 
-// 🔥 Category → Icon Map
+// Category → Icon Map
 const categoryIcons: Record<string, React.ReactNode> = {
   food : <Utensils className="w-5 h-5 text-orange-600" />,
   health: <Heart className="w-5 h-5 text-red-500" />,
@@ -37,7 +39,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
   other: <Activity className="w-5 h-5 text-gray-400" />,
 };
 
-const RecentTransaction = ({ recent }: { recent: Transaction[] }) => {
+const RecentTransaction = ({ recent }: { recent: recentTransactionType[] }) => {
   const router = useRouter();
 
   return (
@@ -79,7 +81,7 @@ const RecentTransaction = ({ recent }: { recent: Transaction[] }) => {
                     <p className="text-sm text-gray-500 flex items-center gap-2">
                       {trans.description}
                       <span className="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
-                      {trans.date}
+                      {toJSDate(trans.date).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

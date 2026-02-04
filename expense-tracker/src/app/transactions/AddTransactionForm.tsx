@@ -1,15 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { recentTransactionType } from "../components/(share_types)/AllTypes";
+import { Budget, recentTransactionType } from "../components/(share_types)/AllTypes";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 import { useAuthStore } from "../store/authstore";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+export const category = [
+  "Food & Dining",
+  "Shopping",
+  "Entertainment",
+  "Health",
+  "Gifts",
+  "Transportation",
+  "Home",
+  "Education",
+  "Income",
+];
 interface AddTransactionFormTypeProp {
   onClose: () => void;
   categories: string[];
   onSave: (newTransaction: recentTransactionType) => void;
   editingData?: recentTransactionType | null;
 }
+import { Timestamp } from "firebase/firestore";
+
+const formatDateForInput = (date: string | Timestamp): string => {
+  if (date instanceof Timestamp) {
+    return date.toDate().toISOString().split("T")[0]; // YYYY-MM-DD
+  }
+  return date;
+};
+
 const AddTransactionForm: React.FC<AddTransactionFormTypeProp> = ({
   onClose,
   onSave,
@@ -29,7 +49,7 @@ const AddTransactionForm: React.FC<AddTransactionFormTypeProp> = ({
         amount: String(editingData.amount) || "",
         category: editingData.category || "",
         payment: editingData.payment || "",
-        date: editingData.date || "",
+        date: formatDateForInput(editingData.date || ""),
       });
     } else {
       // reset form when no editingData
@@ -76,7 +96,7 @@ const AddTransactionForm: React.FC<AddTransactionFormTypeProp> = ({
     onClose();
   };
   const { user } = useAuthStore();
-  const { docs: budgetcategories } = useFirestoreCollection(
+  const { docs: budgetcategories } = useFirestoreCollection<Budget>(
     `users/${user?.uid}/budgetCategories`
   );
   return (

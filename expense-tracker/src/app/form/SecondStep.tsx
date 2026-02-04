@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 
+
 interface Category {
   name: string;
   amount: number;
@@ -48,10 +49,10 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
     );
   };
   const { user } = useAuthStore();
-  const uid = user?.uid;
+  //const uid = user?.uid;
    const {
      addDocument
-      } = useFirestoreCollection(`users/${user?.uid}/budgetCategories`);
+      } = useFirestoreCollection<Category>(`users/${user?.uid}/budgetCategories`);
 
   // 🔹 Form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +78,7 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
     
      
     for (const cat of categories) {
-      await addDocument(cat);
+await addDocument(cat as unknown as Record<string, unknown>);
     }
 
     console.log("✅ Saved categories:", categories);

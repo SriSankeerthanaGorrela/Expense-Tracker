@@ -16,6 +16,7 @@ import getMonthlyExpenses from "./Monthlyexpenses";
 import Loader from "../components/Loader";
 import ErrorState from "../components/Error";
 import Fallback from "../components/Fallback";
+import { recentTransactionType } from "../components/(share_types)/AllTypes";
 
 const DashboardPage = () => {
   const { user } = useAuthStore();
@@ -32,14 +33,14 @@ const DashboardPage = () => {
     docs: transactiondata,
     loading: transLoading,
     error: transError,
-  } = useFirestoreCollection(`users/${user?.uid}/transactions`);
+  } = useFirestoreCollection<recentTransactionType>(`users/${user?.uid}/transactions`);
 
   // Recent 5
   const {
     docs: recentTransactions,
     loading: recentLoading,
     error: recentError,
-  } = useFirestoreCollection(`users/${user?.uid}/transactions`, [], {
+  } = useFirestoreCollection<recentTransactionType>(`users/${user?.uid}/transactions`, [], {
     orderByField: "createdAt",
     order: "desc",
     limit: 5,
@@ -65,7 +66,7 @@ const DashboardPage = () => {
   }
 
   const totalExpenses = transactiondata.reduce((sum, t) => sum + t.amount, 0);
-  const balanceamount = (userInfo?.income ?? 0) - totalExpenses;
+  const balanceamount = Number(userInfo?.income ?? 0) - totalExpenses;
 
   const bargraphdata = getMonthlyExpenses(transactiondata);
   const piechartdata = getCategoryTotals(transactiondata);
@@ -79,16 +80,30 @@ const endOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 // Last Month
 const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+// const thisMonthExpenses = transactiondata
+//   .filter((t) => {
+//     const txnDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
+//     return txnDate >= startOfThisMonth && txnDate <= endOfThisMonth;
+//   })
+//   .reduce((sum, t) => sum + Number(t.amount), 0);
 const thisMonthExpenses = transactiondata
   .filter((t) => {
-    const txnDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
+    const txnDate =
+      typeof t.date === "string"
+        ? new Date(t.date)
+        : t.date.toDate();
     return txnDate >= startOfThisMonth && txnDate <= endOfThisMonth;
   })
-  .reduce((sum, t) => sum + Number(t.amount), 0);
+  .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+  
 
 const lastMonthExpenses = transactiondata
   .filter((t) => {
-    const txnDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
+    // const txnDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
+    const txnDate =
+      typeof t.date === "string"
+        ? new Date(t.date)
+        : t.date.toDate();
     return txnDate >= startOfLastMonth && txnDate <= endOfLastMonth;
   })
   .reduce((sum, t) => sum + Number(t.amount), 0);
@@ -107,7 +122,7 @@ if (lastMonthExpenses > 0) {
       <div className="grid grid-cols-3 gap-4">
         <KpiDataCard
           title="Total Income"
-          value={userInfo?.income ?? "-"}
+          value={Number(userInfo?.income ?? 0)}
           icon={<TrendingUp />}
           changeIcon={<TrendingUp />}
           type="positive"

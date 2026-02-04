@@ -6,23 +6,26 @@ import Dialog from "../components/Dialog";
 import AddBudget from "./AddBudget";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
+import { Budget, recentTransactionType } from "../components/(share_types)/AllTypes";
+import { toJSDate } from "../dashboard/Monthlyexpenses";
 
 const BudgetsPage = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const { user } = useAuthStore();
 
-  // 📌 Fetch Budgets
-  const { docs: budgets } = useFirestoreCollection(
+  // Fetch Budgets
+  const { docs: budgets } = useFirestoreCollection<Budget>(
     `users/${user?.uid}/budgetCategories`
   );
 
-  // 📌 Fetch Transactions
-  const { docs: transactions } = useFirestoreCollection(
+  //  Fetch Transactions
+  const { docs: transactions } = useFirestoreCollection<recentTransactionType>(
     `users/${user?.uid}/transactions`
   );
-
+console.log("budgets", budgets);
+console.log("transactions", transactions);
   // ===============================
-  // 🔥 Calculate spending for each budget
+  // Calculate spending for each budget
   // ===============================
   const now = new Date();
 const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -32,7 +35,7 @@ const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     .filter((t) => {
       if (t.category !== b.name) return false;
 
-      const txnDate = new Date(t.date); // 🔥 make sure you store date in transaction
+      const txnDate = toJSDate(t.date); //  make sure you store date in transaction
       return txnDate >= firstDayOfMonth && txnDate <= lastDayOfMonth;
     })
     .reduce((sum, t) => sum + Number(t.amount), 0);
@@ -49,23 +52,23 @@ const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 });
 
 
-  // 📌 Calculate Total Budget (Sum of limits)
+  // Calculate Total Budget (Sum of limits)
   const totalBudget = budgets.reduce(
     (sum, item) => sum + Number(item.amount),
     0
   );
 
-  // 📌 Total Spent across all categories
+  // Total Spent across all categories
   const totalSpent = budgetsWithSpending.reduce(
     (sum, item) => sum + item.spent,
     0
   );
 
-  // 📌 Remaining = totalBudget - totalSpent
+  // Remaining = totalBudget - totalSpent
   const remaining = totalBudget - totalSpent;
 
   // ===============================
-  // 🎨 UI Color Logic Based on Percentage
+  // UI Color Logic Based on Percentage
   // ===============================
   const getColorClass = (percentage: number) => {
     if (percentage >= 90) return "red";

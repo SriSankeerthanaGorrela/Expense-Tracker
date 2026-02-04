@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { monthlyExpensesType } from '../components/(share_types)/AllTypes'
 
 
 const StatGraph = ({ graph }: { graph: monthlyExpensesType[] }) => {

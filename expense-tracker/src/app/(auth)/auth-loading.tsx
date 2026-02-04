@@ -13,7 +13,7 @@ export default function AuthLoading() {
   useEffect(() => {
     checkAuth();
     router.replace("/dashboard");
-  }, []);
+  }, [checkAuth, router]);
 
   return <Loader message="Logging you in..." />;
 }

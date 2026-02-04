@@ -26,7 +26,7 @@ const navItems = [
 
 
 
-export function Sidebar() {
+export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const {logout} =useAuthStore()

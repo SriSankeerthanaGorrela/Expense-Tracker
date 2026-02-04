@@ -29,13 +29,13 @@ export default function AuthForm({ value }: { value: string }) {
   } = useForm({
     defaultValues: { email: "", password: "" },
   });
-const { isNewuser } = useAuthStore()
+//const { isNewuser } = useAuthStore()
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const router = useRouter();
   const { login } = useAuthStore();
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: { email: string; password: string }) {
     const { email, password } = data;
     setLoading(true);
     
@@ -81,7 +81,7 @@ const { isNewuser } = useAuthStore()
 
         let userData = {
           uid,
-          email: userCredential.user.email,
+          email: userCredential.user.email ?? undefined,
           isNewuser: false,
         };
 
@@ -92,18 +92,18 @@ const { isNewuser } = useAuthStore()
         login(userData);
         reset();
         toast.success("Logged in successfully!");
-        if (isNewuser) {
+        if (userData.isNewuser) {
           router.push("/form")
         }
         else {
           router.push("/dashboard");
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("FULL ERROR:", err);
 
       let message = "Something went wrong. Try again.";
-
+if (err instanceof Error && 'code' in err)
       switch (err.code) {
         case "auth/invalid-credential":
         case "auth/wrong-password":
@@ -199,11 +199,13 @@ const { isNewuser } = useAuthStore()
               placeholder="Password"
               autoComplete="new-password"
               {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
+                required: "Password is required", 
+                ...(value === "Register" && {
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                }),
               })}
               className="input-field"
             />

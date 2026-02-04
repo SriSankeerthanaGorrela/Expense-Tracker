@@ -1,11 +1,25 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface recentTransactionType{
   icon?:React.ReactNode;
   id?:string;
   description:string;
   payment:string;
-  date:string;
+  date:string | Timestamp;
   category:string;
   amount:number;
+  createdAt?:Timestamp;
+}
+export type Budget = {
+  id: string;
+  name: string;
+  amount: number;
+  createdAt?: Timestamp;
+};
+
+export interface monthlyExpensesType {
+  month: string;
+  expense: number;
 }
 
 export interface GoalCardProps {

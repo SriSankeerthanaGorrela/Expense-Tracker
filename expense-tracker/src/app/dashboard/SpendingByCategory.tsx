@@ -7,7 +7,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import { spendingByCategoryType } from './page';
+
 
 const COLORS = [
   '#4f46e5', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6',
@@ -23,7 +23,7 @@ export interface spendingByCategoryChartType {
 const SpendingByCategory = ({
   category,
 }: {
-  category: spendingByCategoryType[];
+  category: spendingByCategoryChartType[];
 }) => {
   return (
     <div className="">

@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
-
-const data = {
+const data: Record<string, string[]> = {
   "Andhra Pradesh": ["Vijayawada", "Guntur", "Visakhapatnam"],
   Telangana: ["Hyderabad", "Warangal", "Khammam"],
   Karnataka: ["Bengaluru", "Mysore", "Mangalore"],
 };
+
+
 
 export default function NestedDropdown() {
   const [open, setOpen] = useState(false);

@@ -18,6 +18,7 @@ import {
   QueryDocumentSnapshot,
   serverTimestamp,
   setDoc,
+  
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -31,6 +32,8 @@ const getCollectionRef = (
   path: string[]
 ): CollectionReference<DocumentData> => {
   let ref: unknown = db;
+    //let ref: Firestore | CollectionReference<DocumentData> | DocumentReference<DocumentData> = db;
+
 
   for (let i = 0; i < path.length; i += 2) {
     const col = path[i];

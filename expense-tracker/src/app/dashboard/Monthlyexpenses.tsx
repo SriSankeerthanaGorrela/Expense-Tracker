@@ -1,9 +1,11 @@
+import { recentTransactionType } from "../components/(share_types)/AllTypes";
+import { Timestamp } from "firebase/firestore";
 
- const getMonthlyExpenses = (transactions) => {
-  const monthlyTotals = {};
+ const getMonthlyExpenses = (transactions:recentTransactionType[]) => {
+  const monthlyTotals:Record<string,number> = {};
 
   transactions.forEach(t => {
-    const monthIndex = new Date(t.date).getMonth(); // 0–11
+    const monthIndex = toJSDate(t.date).getMonth(); // 0–11
     const monthName = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][monthIndex];
 
     if (!monthlyTotals[monthName]) {
@@ -19,8 +21,8 @@
 };
 export default getMonthlyExpenses;
 
- export const getCategoryTotals = (transactions) => {
-  const totals = {};
+ export const getCategoryTotals = (transactions:recentTransactionType[]) => {
+  const totals:Record<string,number> = {};
 
   transactions.forEach(t => {
     const category = t.category;
@@ -34,4 +36,12 @@ export default getMonthlyExpenses;
     category,
     value,
   }));
+};
+
+
+export const toJSDate = (date: string | Timestamp): Date => {
+  if (date instanceof Timestamp) {
+    return date.toDate();
+  }
+  return new Date(date);
 };

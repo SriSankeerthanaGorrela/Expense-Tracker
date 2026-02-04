@@ -182,9 +182,16 @@ import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 import WeeklyTrendChart from "./Weeklytrends";
 import { Lightbulb } from "lucide-react";
-
+import { recentTransactionType } from "../components/(share_types)/AllTypes";
+import { toJSDate } from "../dashboard/Monthlyexpenses";
+interface Analytics {
+  totalSpent: number;
+  totalSaved: number;
+  monthlyAverage: number;
+  categoryTotals: Record<string, number>;
+}
 export default function Page() {
-  const [analytics, setAnalytics] = useState(null);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [insights, setInsights] = useState("");
 
   const { user } = useAuthStore();
@@ -196,7 +203,7 @@ export default function Page() {
 
   // ⬇️ Fetch transactions collection
   const { docs: transactions, loading: txLoading } =
-    useFirestoreCollection(`users/${userId}/transactions`);
+    useFirestoreCollection<recentTransactionType>(`users/${userId}/transactions`);
 
   // ------------------------------------
   // CALCULATE ANALYTICS WHEN DATA ARRIVES
@@ -210,10 +217,10 @@ export default function Page() {
     const totalSaved = income - totalSpent;
 
     // GROUP BY MONTH
-    const monthlyGroups = {};
+    const monthlyGroups:Record<string, number> = {};
     transactions.forEach((t) => {
       if (!t.date) return;
-      const d = new Date(t.date);
+      const d = toJSDate(t.date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       monthlyGroups[key] = (monthlyGroups[key] || 0) + t.amount;
     });
@@ -226,7 +233,7 @@ export default function Page() {
       : totalSpent;
 
     // CATEGORY TOTALS
-    const categoryTotals = transactions.reduce((acc, t) => {
+    const categoryTotals = transactions.reduce<Record<string, number>>((acc, t) => {
       const cat = t.category || "Uncategorized";
       acc[cat] = (acc[cat] || 0) + t.amount;
       return acc;
