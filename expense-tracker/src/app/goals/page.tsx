@@ -22,8 +22,12 @@ import {
 import toast from "react-hot-toast";
 import GoalCompletedModal from "../components/CompletedModal";
 
-
+ type FirestoreTimestamp = {
+  seconds: number;
+  nanoseconds: number;
+};
 function Page() {
+  
   const { user } = useAuthStore();
 
   const {
@@ -109,27 +113,40 @@ const [contributions, setContributions] = useState<unknown[]>([]);
             Math.floor((Number(current) / Number(goal.targetAmount)) * 100),
             100
           );
-          const getDaysLeft = (targetDate: any) => {
+        
+
+const getDaysLeft = (targetDate: unknown) => {
   if (!targetDate) return 0;
 
   let dateObj: Date;
 
-  // 🔹 Case 1: Firestore Timestamp
-  if (targetDate?.seconds) {
-    dateObj = new Date(targetDate.seconds * 1000);
+  // ✅ Firestore Timestamp
+  if (
+    typeof targetDate === "object" &&
+    targetDate !== null &&
+    "seconds" in targetDate
+  ) {
+    const ts = targetDate as FirestoreTimestamp;
+    dateObj = new Date(ts.seconds * 1000);
   }
-  // 🔹 Case 2: Already Date object
+  // ✅ JS Date
   else if (targetDate instanceof Date) {
     dateObj = targetDate;
   }
-  // 🔹 Case 3: String
-  else {
+  // ✅ String date
+  else if (typeof targetDate === "string") {
     dateObj = new Date(targetDate);
+  }
+  // ❌ Unknown format
+  else {
+    return 0;
   }
 
   if (isNaN(dateObj.getTime())) return 0;
 
-  return Math.ceil((dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  return Math.ceil(
+    (dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  );
 };
 
           const daysLeft = getDaysLeft(goal.targetDate);

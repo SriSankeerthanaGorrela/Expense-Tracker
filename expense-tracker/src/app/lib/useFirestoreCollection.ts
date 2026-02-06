@@ -70,7 +70,7 @@ export const useFirestoreCollection = <T = FirestoreDoc>(
       setError((err as Error).message);
       setLoading(false);
     }
-  }, [authLoading, user?.uid, pathString, stableFilters, stableOptions]);
+  },[authLoading, user, path, pathString, stableFilters, stableOptions]);
 
   // CRUD operations
   const addDocument = async (data: Record<string, unknown>) => {

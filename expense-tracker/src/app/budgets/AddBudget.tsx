@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
 import toast from "react-hot-toast";
-import { Budget } from "../components/(share_types)/AllTypes";
 type AddBudgetProps = {
   onClose: () => void;
 };

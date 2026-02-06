@@ -57,7 +57,7 @@ const SettingsPage = ({ onClose }) => {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
-        let userData = userSnap.exists() ? userSnap.data() : {};
+        const userData = userSnap.exists() ? userSnap.data() : {};
 
         // Fetch Budget Categories
         const budgetSnap = await getDocs(
@@ -110,12 +110,12 @@ const SettingsPage = ({ onClose }) => {
       const oldBudgetDocs = await getDocs(budgetRef);
 
       // Delete previous docs
-      for (let docu of oldBudgetDocs.docs) {
+      for (const docu of oldBudgetDocs.docs) {
         await deleteDoc(docu.ref);
       }
 
       // Add new docs
-      for (let b of data.budgetCategories) {
+      for (const b of data.budgetCategories) {
         if (b.name.trim() !== "") {
           await addDoc(budgetRef, b);
         }
@@ -125,11 +125,11 @@ const SettingsPage = ({ onClose }) => {
       const goalsRef = collection(db, "users", user.uid, "goals");
       const oldGoalDocs = await getDocs(goalsRef);
 
-      for (let docu of oldGoalDocs.docs) {
+      for (const docu of oldGoalDocs.docs) {
         await deleteDoc(docu.ref);
       }
 
-      for (let g of data.goals) {
+      for (const g of data.goals) {
         if (g.goalName.trim() !== "") {
           await addDoc(goalsRef, g);
         }

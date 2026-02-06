@@ -18,35 +18,36 @@ import {
   QueryDocumentSnapshot,
   serverTimestamp,
   setDoc,
+  Firestore,
   
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-export type FirestoreDoc = {
+export type FirestoreDoc<T = Record<string, unknown>> = T & {
   id: string;
-  [key: string]: unknown;
 };
 
 // Get Collection Reference
 const getCollectionRef = (
   path: string[]
 ): CollectionReference<DocumentData> => {
-  let ref: unknown = db;
-    //let ref: Firestore | CollectionReference<DocumentData> | DocumentReference<DocumentData> = db;
-
-
-  for (let i = 0; i < path.length; i += 2) {
-    const col = path[i];
-    const id = path[i + 1];
-
-    if (id) {
-      ref = doc(ref, col, id);
-    } else {
-      ref = collection(ref, col);
-    }
+  if (path.length % 2 === 0) {
+    throw new Error("Invalid collection path");
   }
 
-  return ref as CollectionReference<DocumentData>;
+  let current: Firestore | DocumentReference<DocumentData> = db;
+
+  for (let i = 0; i < path.length - 1; i += 2) {
+    const col = path[i];
+    const docId = path[i + 1];
+
+    current = doc(current, col, docId);
+  }
+
+  // Final segment MUST be a collection
+  const lastCollection = path[path.length - 1];
+
+  return collection(current, lastCollection);
 };
 
 // Get Document Reference
@@ -224,14 +225,13 @@ addDocumentAtPath: async (
   // ===========================================================
   // 🔥 UPDATE DOCUMENT
   // ===========================================================
-  updateDocumentAtPath: async (
-    path: string[],
-    data: DocumentData
-  ): Promise<FirestoreDoc> => {
-    const docRef = getDocumentRef(path);
-    await updateDoc(docRef, data);
-    return { id: path[path.length - 1], ...data };
-  },
+ updateDocumentAtPath: async (
+  path: string[],
+  data: DocumentData
+): Promise<void> => {
+  const docRef = getDocumentRef(path);
+  await updateDoc(docRef, data);
+},
 
   // ===========================================================
   // 🔥 DELETE DOCUMENT

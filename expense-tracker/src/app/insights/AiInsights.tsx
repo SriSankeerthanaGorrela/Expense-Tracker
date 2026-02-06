@@ -1,4 +1,4 @@
-export async function getAIInsights(analyticsData: any) {
+export async function getAIInsights(analyticsData:unknown) {
   try {
     const res = await fetch("/api/insights", {
       method: "POST",

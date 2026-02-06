@@ -6,7 +6,7 @@ type UserData = {
   email?: string;
   name?: string;
   isNewuser?: boolean;
-  [key: string]: any; // for other optional fields
+  
 };
 
 type AuthStore = {
