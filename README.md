@@ -13,7 +13,6 @@ A simple and modern expense tracker built with **Next.js**, **Tailwind CSS**, **
 - Categorize expenses (e.g. food, travel, shopping)
 - Dashboard view with summaries \& analytics
 - Real-time database sync using Firebase Firestore
-- Responsive design (mobile \& desktop)
 - Push notifications for reminders
 
 ***
@@ -143,7 +142,31 @@ Pull requests are welcome! For major changes, please open an issue first.
 
 ***
 
-## License
+1. Smart Insights (AI-like)
 
-This project is licensed under the MIT License.
+Show insights such as:
 
+“You spent 20% more on Food this month compared to last month.”
+“You’re saving only 8% — target is 20%. Try reducing Entertainment expenses.”
+
+You can compute this in frontend logic or Firebase Cloud Function.
+
+📅 2. Monthly Reminder Emails
+
+Use Firebase Cloud Functions + SendGrid:
+
+Send automatic email on the 1st of every month:
+
+“Hi Sankeerthana! Your October summary is ready. You saved ₹8,200!”
+
+🧾 3. Budget Alerts
+
+User sets monthly budget → show progress bar (used vs remaining budget).
+If 90% spent, show alert:
+
+“You’ve almost reached your monthly spending limit!”
+
+💬 4. Expense Notes / Tags
+
+User can tag expenses (e.g., “Office”, “Personal”)
+→ Filter by tags later.
