@@ -34,7 +34,7 @@ const DashboardPage = () => {
     loading: transLoading,
     error: transError,
   } = useFirestoreCollection<recentTransactionType>(`users/${user?.uid}/transactions`);
-
+console.log("API KEY:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
   // Recent 5
   const {
     docs: recentTransactions,

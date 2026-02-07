@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { useForm } from "react-hook-form";
-import { auth, db } from "../lib/firebase";
+import { db, getFirebaseAuth } from "../lib/firebase";
 import { useRouter } from "next/navigation";
 import {
   Eye,
@@ -43,12 +43,14 @@ export default function AuthForm({ value }: { value: string }) {
     try {
       // ================= REGISTER =================
       if (value === "Register") {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+       const auth = getFirebaseAuth();
+if (!auth) return;
 
+const userCredential = await createUserWithEmailAndPassword(
+  auth,
+  email,
+  password
+);
         const user = {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
@@ -69,11 +71,14 @@ export default function AuthForm({ value }: { value: string }) {
 
       // ================= LOGIN =================
       else {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+       const auth = getFirebaseAuth();
+if (!auth) return;
+
+const userCredential = await signInWithEmailAndPassword(
+  auth,
+  email,
+  password
+);
 
         const uid = userCredential.user.uid;
         const docRef = doc(db, "users", uid);
