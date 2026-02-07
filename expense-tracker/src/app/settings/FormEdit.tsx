@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
   doc,
@@ -11,16 +11,25 @@ import {
   deleteDoc,
   addDoc,
 } from "firebase/firestore";
-
-import { useAuthStore } from "@/app/store/authstore";
-import { db } from "../lib/firebase";
 import { Trash2 } from "lucide-react";
 
-const SettingsPage = ({ onClose }) => {
+import { useAuthStore } from "@/app/store/authstore";
+import { getFirebaseDB } from "../lib/firebase";
+
+type SettingsForm = {
+  name: string;
+  email: string;
+  income: number | "";
+  targetSavings: number | "";
+  budgetCategories: { name: string; amount: number | "" }[];
+  goals: { goalName: string; targetAmount: number | "" }[];
+};
+
+const SettingsPage = ({ onClose }: { onClose?: () => void }) => {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
-  const { register, handleSubmit, control, reset } = useForm({
+  const { register, handleSubmit, control, reset } = useForm<SettingsForm>({
     defaultValues: {
       name: "",
       email: "",
@@ -31,7 +40,6 @@ const SettingsPage = ({ onClose }) => {
     },
   });
 
-  // Dynamic Fields
   const {
     fields: budgetFields,
     append: addBudget,
@@ -50,179 +58,127 @@ const SettingsPage = ({ onClose }) => {
     name: "goals",
   });
 
-  // Fetch user data + subcollections
+  // ================= FETCH USER DATA =================
   useEffect(() => {
-    const fetchUserData = async () => {
+    if (!user?.uid) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
       try {
+        const db = getFirebaseDB();
+        if (!db) return;
+
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-
         const userData = userSnap.exists() ? userSnap.data() : {};
 
-        // Fetch Budget Categories
         const budgetSnap = await getDocs(
           collection(db, "users", user.uid, "budgetCategories")
         );
-        const budgetData = budgetSnap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
 
-        // Fetch Goals
         const goalsSnap = await getDocs(
           collection(db, "users", user.uid, "goals")
         );
-        const goalsData = goalsSnap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
 
         reset({
-          ...userData,
-          email: user?.email,
-          budgetCategories: budgetData,
-          goals: goalsData,
+          name: userData.name ?? "",
+          email: user.email ?? "",
+          income: userData.income ?? "",
+          targetSavings: userData.targetSavings ?? "",
+          budgetCategories: budgetSnap.docs.map((d) => d.data() as any),
+          goals: goalsSnap.docs.map((d) => d.data() as any),
         });
       } catch (err) {
-        console.error("Error fetching settings:", err);
+        console.error("Failed to load settings:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserData();
-  }, [user, reset]);
+    fetchData();
+  }, [user?.uid]);
 
-  // Save Form
-  const onSubmit = async (data) => {
+  // ================= SAVE SETTINGS =================
+  const onSubmit = async (data: SettingsForm) => {
     try {
+      if (!user?.uid) return;
+
+      const db = getFirebaseDB();
+      if (!db) return;
+
       const userRef = doc(db, "users", user.uid);
 
-      // Update main user data
       await updateDoc(userRef, {
         name: data.name,
         income: data.income,
         targetSavings: data.targetSavings,
       });
 
-      // Update Budget Categories Subcollection
+      // ---------- Budget Categories ----------
       const budgetRef = collection(db, "users", user.uid, "budgetCategories");
-      const oldBudgetDocs = await getDocs(budgetRef);
+      const oldBudgets = await getDocs(budgetRef);
 
-      // Delete previous docs
-      for (const docu of oldBudgetDocs.docs) {
-        await deleteDoc(docu.ref);
-      }
+      await Promise.all(oldBudgets.docs.map((d) => deleteDoc(d.ref)));
 
-      // Add new docs
-      for (const b of data.budgetCategories) {
-        if (b.name.trim() !== "") {
-          await addDoc(budgetRef, b);
-        }
-      }
+      await Promise.all(
+        data.budgetCategories
+          .filter((b) => b.name?.trim())
+          .map((b) => addDoc(budgetRef, b))
+      );
 
-      // Update Goals Subcollection
+      // ---------- Goals ----------
       const goalsRef = collection(db, "users", user.uid, "goals");
-      const oldGoalDocs = await getDocs(goalsRef);
+      const oldGoals = await getDocs(goalsRef);
 
-      for (const docu of oldGoalDocs.docs) {
-        await deleteDoc(docu.ref);
-      }
+      await Promise.all(oldGoals.docs.map((d) => deleteDoc(d.ref)));
 
-      for (const g of data.goals) {
-        if (g.goalName.trim() !== "") {
-          await addDoc(goalsRef, g);
-        }
-      }
+      await Promise.all(
+        data.goals
+          .filter((g) => g.goalName?.trim())
+          .map((g) => addDoc(goalsRef, g))
+      );
 
       alert("Settings updated successfully!");
-      if (onClose) onClose();
+      onClose?.();
     } catch (err) {
-      console.log("Error saving settings:", err);
+      console.error("Error saving settings:", err);
     }
   };
 
-  if (loading) return <p className="p-6 text-center">Loading...</p>;
+  if (loading) {
+    return <p className="p-6 text-center">Loading...</p>;
+  }
 
+  // ================= UI =================
   return (
     <div className="p-6 min-h-screen">
       <h1 className="text-2xl font-semibold mb-6">Edit Your Details</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
-        {/* PERSONAL DETAILS */}
+        {/* PERSONAL */}
         <div className="grid grid-cols-2 gap-6">
-          <div>
-            <label className="block mb-2 text-sm">Name</label>
-            <input
-              {...register("name")}
-              className="input-field"
-              placeholder="Enter your name"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Email</label>
-            <input
-              {...register("email")}
-              readOnly
-              className="input-field bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Monthly Income</label>
-            <input
-              {...register("income")}
-              type="number"
-              className="input-field"
-              placeholder="Enter your income"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Target Savings (%)</label>
-            <input
-              {...register("targetSavings")}
-              type="number"
-              className="input-field"
-              placeholder="Enter savings target"
-            />
-          </div>
+          <input {...register("name")} placeholder="Name" className="input-field" />
+          <input {...register("email")} readOnly className="input-field bg-gray-100" />
+          <input {...register("income")} type="number" placeholder="Income" className="input-field" />
+          <input {...register("targetSavings")} type="number" placeholder="Savings %" className="input-field" />
         </div>
 
-        {/* BUDGET CATEGORIES */}
+        {/* BUDGETS */}
         <div>
           <div className="flex justify-between mb-3">
-            <h2 className="font-semibold text-lg">Budget Categories</h2>
-            <button
-              type="button"
-              onClick={() => addBudget({ name: "", amount: "" })}
-              className="bg-blue-500 px-4 py-2 rounded text-white"
-            >
-              Add Category
+            <h2 className="font-semibold">Budget Categories</h2>
+            <button type="button" onClick={() => addBudget({ name: "", amount: "" })}>
+              Add
             </button>
           </div>
 
-          {budgetFields.map((field, index) => (
-            <div key={field.id} className="flex gap-4 items-center mb-3">
-              <input
-                {...register(`budgetCategories.${index}.name`)}
-                placeholder="Category"
-                className="input-field"
-              />
-
-              <input
-                {...register(`budgetCategories.${index}.amount`)}
-                type="number"
-                placeholder="Limit"
-                className="input-field"
-              />
-
-              <button
-                type="button"
-                onClick={() => removeBudget(index)}
-                className="text-red-600"
-              >
+          {budgetFields.map((f, i) => (
+            <div key={f.id} className="flex gap-3 mb-2">
+              <input {...register(`budgetCategories.${i}.name`)} className="input-field" />
+              <input {...register(`budgetCategories.${i}.amount`)} type="number" className="input-field" />
+              <button type="button" onClick={() => removeBudget(i)}>
                 <Trash2 size={18} />
               </button>
             </div>
@@ -232,48 +188,26 @@ const SettingsPage = ({ onClose }) => {
         {/* GOALS */}
         <div>
           <div className="flex justify-between mb-3">
-            <h2 className="font-semibold text-lg">Goals</h2>
-            <button
-              type="button"
-              onClick={() => addGoal({ goalName: "", targetAmount: "" })}
-              className="bg-blue-500 px-4 py-2 rounded text-white"
-            >
-              Add Goal
+            <h2 className="font-semibold">Goals</h2>
+            <button type="button" onClick={() => addGoal({ goalName: "", targetAmount: "" })}>
+              Add
             </button>
           </div>
 
-          {goalFields.map((field, index) => (
-            <div key={field.id} className="flex gap-4 items-center mb-3">
-              <input
-                {...register(`goals.${index}.goalName`)}
-                placeholder="Goal Name"
-                className="input-field"
-              />
-
-              <input
-                {...register(`goals.${index}.targetAmount`)}
-                type="number"
-                placeholder="Target ₹"
-                className="input-field"
-              />
-
-              <button
-                type="button"
-                onClick={() => removeGoal(index)}
-                className="text-red-600"
-              >
+          {goalFields.map((f, i) => (
+            <div key={f.id} className="flex gap-3 mb-2">
+              <input {...register(`goals.${i}.goalName`)} className="input-field" />
+              <input {...register(`goals.${i}.targetAmount`)} type="number" className="input-field" />
+              <button type="button" onClick={() => removeGoal(i)}>
                 <Trash2 size={18} />
               </button>
             </div>
           ))}
         </div>
 
-        {/* SUBMIT */}
-        <div className="text-right">
-          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">
-            Save Changes
-          </button>
-        </div>
+        <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded">
+          Save Changes
+        </button>
       </form>
     </div>
   );

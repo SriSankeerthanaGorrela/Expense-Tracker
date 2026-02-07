@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
 
 import KpiDataCard from "../components/kpiDataCard";
@@ -66,7 +66,7 @@ console.log("API KEY:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
   }
 
   const totalExpenses = transactiondata.reduce((sum, t) => sum + t.amount, 0);
-  const balanceamount = Number(userInfo?.income ?? 0) - totalExpenses;
+
 
   const bargraphdata = getMonthlyExpenses(transactiondata);
   const piechartdata = getCategoryTotals(transactiondata);
@@ -116,7 +116,7 @@ if (lastMonthExpenses > 0) {
 
   expenseType = expenseChange > 0 ? "negative" : "positive";
 }
-
+  const balanceamount = Number(userInfo?.income ?? 0) - thisMonthExpenses;
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-4">

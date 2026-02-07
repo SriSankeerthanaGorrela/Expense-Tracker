@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Lock } from "lucide-react";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { getFirebaseAuth } from "../lib/firebase";
@@ -50,14 +50,15 @@ const handlePasswordChange = async (e) => {
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
-  } catch (error) {
-    if (error.code === "auth/wrong-password") {
-      setMessage("❌ The current password is incorrect.");
-    } else if (error.code === "auth/requires-recent-login") {
-      setMessage("⚠️ Please re-login and try again.");
-    } else {
-      setMessage("⚠️ " + error.message);
-    }
+  } catch (error: any) {
+  if (error.code === "auth/wrong-password") {
+    setMessage("❌ The current password is incorrect.");
+  } else if (error.code === "auth/requires-recent-login") {
+    setMessage("⚠️ Please re-login and try again.");
+  } else {
+    setMessage("⚠️ " + error.message);
+  }
+
   } finally {
     setLoading(false);
   }
