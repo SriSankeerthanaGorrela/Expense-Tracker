@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Lock } from "lucide-react";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
-import { auth } from "../lib/firebase"; // your Firebase auth instance
+import { getFirebaseAuth } from "../lib/firebase";
 import { useAuthStore } from "../store/authstore"; // to get current user
 
 function UpdatePassword() {
@@ -13,45 +13,55 @@ function UpdatePassword() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setLoading(true);
+const handlePasswordChange = async (e) => {
+  e.preventDefault();
+  setMessage("");
+  setLoading(true);
 
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setMessage("⚠️ Please fill all fields.");
-      setLoading(false);
-      return;
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    setMessage("⚠️ Please fill all fields.");
+    setLoading(false);
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    setMessage("❌ New passwords do not match.");
+    setLoading(false);
+    return;
+  }
+
+  const auth = getFirebaseAuth();
+  if (!auth || !auth.currentUser || !user?.email) {
+    setMessage("⚠️ User not authenticated.");
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      oldPassword
+    );
+
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    await updatePassword(auth.currentUser, newPassword);
+
+    setMessage("✅ Password updated successfully!");
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  } catch (error) {
+    if (error.code === "auth/wrong-password") {
+      setMessage("❌ The current password is incorrect.");
+    } else if (error.code === "auth/requires-recent-login") {
+      setMessage("⚠️ Please re-login and try again.");
+    } else {
+      setMessage("⚠️ " + error.message);
     }
-
-    if (newPassword !== confirmPassword) {
-      setMessage("❌ New passwords do not match.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const credential = EmailAuthProvider.credential(user?.email, oldPassword);
-      await reauthenticateWithCredential(auth.currentUser, credential);
-
-      await updatePassword(auth.currentUser, newPassword);
-
-      setMessage("✅ Password updated successfully!");
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error) {
-      if (error.code === "auth/wrong-password") {
-        setMessage("❌ The current password is incorrect.");
-      } else if (error.code === "auth/requires-recent-login") {
-        setMessage("⚠️ Please re-login and try again.");
-      } else {
-        setMessage("⚠️ " + error.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bg-white shadow-md rounded-2xl border border-gray-200 p-8 w-full mx-auto space-y-6">
