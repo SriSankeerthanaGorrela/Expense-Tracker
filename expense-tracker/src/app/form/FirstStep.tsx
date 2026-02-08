@@ -4,21 +4,19 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreDocument } from "../lib/useFirestoreDocument";
 
-// ✅ Type for your form fields
+
 type FirstStepFormData = {
   name: string;
   occupation: string;
   income: number;
   targetSavings: number;
 };
-
-// ✅ Props for your component
 interface FirstStepProps {
   onContinue: () => void;
 }
 
 const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
-  // ✅ Tell react-hook-form what data type you're using
+
   const {
     register,
     handleSubmit,
@@ -34,7 +32,7 @@ const FirstStep: React.FC<FirstStepProps> = ({ onContinue }) => {
  const { user,login } = useAuthStore();
   const userId = user?.uid;
   const {updateDocument}=useFirestoreDocument(`users/${userId}`)
-  // ✅ Ensure `data` is strongly typed
+ 
   const onSubmit: SubmitHandler<FirstStepFormData> = async(data) => {
     console.log("Step 1 Data:", data);
     await updateDocument({ ...data })

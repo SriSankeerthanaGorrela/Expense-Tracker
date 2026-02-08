@@ -49,14 +49,14 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
     );
   };
   const { user } = useAuthStore();
-  //const uid = user?.uid;
+  
    const {
      addDocument
       } = useFirestoreCollection<Category>(`users/${user?.uid}/budgetCategories`);
 
-  // 🔹 Form submission
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // stop page reload
+    e.preventDefault();
     const hasEmpty = categories.some(
       (cat) => cat.amount === 0
     );
@@ -67,14 +67,7 @@ const SecondStep: React.FC<SecondStepProps> = ({ onContinue }) => {
     }
 
     try {
-      // 🔥 Save to Firestore
-      // await updateDocument({
-      //   budgetCategories: categories, // field name inside Firestore doc
-      // const path=["users",user?.uid,"budgetCategories"];
-      // //add each category asa seperate document
-      // for(const cat of categories){
-      //   await firestoreService.addDocumentAtPath(path,cat)
-      // }
+      
     
      
     for (const cat of categories) {

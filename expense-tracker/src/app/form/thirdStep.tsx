@@ -8,7 +8,7 @@ import { Plus, Shell, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 type Goal = {
-  id: string; // now string because Firestore doc IDs are strings
+  id: string; 
   goalName: string;
   goalType: string;
   targetAmount: number;
@@ -56,16 +56,12 @@ const [loading, setLoading] = useState(false);
     ]);
   };
 
-  // -------------------------------
-  // REMOVE A GOAL
-  // -------------------------------
+  
   const removeGoal = (index: number) => {
     setGoals((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // -------------------------------
-  // SUBMIT FORM
-  // -------------------------------
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -85,7 +81,7 @@ const [loading, setLoading] = useState(false);
           }
         );
 
-        // 2️⃣ Save the doc ID inside the document
+       
         await updateDoc(
           doc(db, "users", user.uid, "goals", docRef.id),
           {
@@ -125,7 +121,7 @@ const [loading, setLoading] = useState(false);
           key={index}
           className="grid grid-cols-3 gap-3 items-center bg-gray-100  p-3 rounded-lg"
         >
-          {/* Goal Name */}
+          
           <input
             type="text"
             placeholder="Goal Name"
@@ -136,7 +132,7 @@ const [loading, setLoading] = useState(false);
             className="input-field"
           />
 
-          {/* Goal Type */}
+       
           <select
             value={goal.goalType}
             onChange={(e) =>
@@ -152,7 +148,6 @@ const [loading, setLoading] = useState(false);
             ))}
           </select>
 
-          {/* Target Amount + Remove button */}
           <div className="flex items-center gap-2">
             <input
               type="number"
