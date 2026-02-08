@@ -6,7 +6,10 @@ import Dialog from "../components/Dialog";
 import AddBudget from "./AddBudget";
 import { useAuthStore } from "../store/authstore";
 import { useFirestoreCollection } from "../lib/useFirestoreCollection";
-import { Budget, recentTransactionType } from "../components/(share_types)/AllTypes";
+import {
+  Budget,
+  recentTransactionType,
+} from "../components/(share_types)/AllTypes";
 import { toJSDate } from "../dashboard/Monthlyexpenses";
 
 const BudgetsPage = () => {
@@ -15,53 +18,52 @@ const BudgetsPage = () => {
 
   // Fetch Budgets
   const { docs: budgets } = useFirestoreCollection<Budget>(
-    `users/${user?.uid}/budgetCategories`
+    `users/${user?.uid}/budgetCategories`,
   );
 
   //  Fetch Transactions
   const { docs: transactions } = useFirestoreCollection<recentTransactionType>(
-    `users/${user?.uid}/transactions`
+    `users/${user?.uid}/transactions`,
   );
-console.log("budgets", budgets);
-console.log("transactions", transactions);
+  console.log("budgets", budgets);
+  console.log("transactions", transactions);
   // ===============================
   // Calculate spending for each budget
   // ===============================
   const now = new Date();
-const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const budgetsWithSpending = budgets.map((b) => {
-  const spent = transactions
-    .filter((t) => {
-      if (t.category !== b.name) return false;
+    const spent = transactions
+      .filter((t) => {
+        if (t.category !== b.name) return false;
 
-      const txnDate = toJSDate(t.date); //  make sure you store date in transaction
-      return txnDate >= firstDayOfMonth && txnDate <= lastDayOfMonth;
-    })
-    .reduce((sum, t) => sum + Number(t.amount), 0);
+        const txnDate = toJSDate(t.date); //  make sure you store date in transaction
+        return txnDate >= firstDayOfMonth && txnDate <= lastDayOfMonth;
+      })
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  const percentage = (spent / Number(b.amount)) * 100;
-  const safepercentage = percentage > 100 ? 100 : percentage;
+    const percentage = (spent / Number(b.amount)) * 100;
+    const safepercentage = percentage > 100 ? 100 : percentage;
 
-  return {
-    ...b,
-    spent,
-    percentage: Number(percentage.toFixed(2)),
-    safepercentage,
-  };
-});
-
+    return {
+      ...b,
+      spent,
+      percentage: Number(percentage.toFixed(2)),
+      safepercentage,
+    };
+  });
 
   // Calculate Total Budget (Sum of limits)
   const totalBudget = budgets.reduce(
     (sum, item) => sum + Number(item.amount),
-    0
+    0,
   );
 
   // Total Spent across all categories
   const totalSpent = budgetsWithSpending.reduce(
     (sum, item) => sum + item.spent,
-    0
+    0,
   );
 
   // Remaining = totalBudget - totalSpent
@@ -117,7 +119,11 @@ const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
           <span>Add Budget</span>
         </button>
 
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} size="sm">
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          size="sm"
+        >
           <AddBudget onClose={() => setOpenDialog(false)} />
         </Dialog>
       </div>
@@ -178,11 +184,13 @@ const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 className={`py-3 px-2 rounded-xl flex items-center gap-2 text-sm ${style.alertBg} ${style.text}`}
               >
                 <CircleAlert className={`w-4 h-4 ${style.icon}`} />
-                {budget.percentage >= 100
-                  ? "Budget exceeded! this month."
-                  : budget.percentage >= 90
-                  ? "You're approaching your budget limit per month."
-                  : "You're within your budget this month."}
+               {budget.percentage > 100
+  ? "Budget exceeded this month."
+  : budget.percentage === 100
+    ? "You've hit your budget limit this month."
+    : budget.percentage >= 90
+      ? "You're approaching your budget limit this month."
+      : "You're within your budget this month."}
               </p>
             </div>
           );
