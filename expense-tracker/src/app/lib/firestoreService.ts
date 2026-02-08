@@ -18,16 +18,22 @@ import {
   QueryDocumentSnapshot,
   serverTimestamp,
   setDoc,
-  Firestore,
-  
 } from "firebase/firestore";
 import { db } from "./firebase";
 
-export type FirestoreDoc<T = Record<string, unknown>> = T & {
+/**
+ * 🔑 Firestore document type
+ * ID comes ONLY from Firestore, never stored in data
+ */
+export type FirestoreDoc = {
   id: string;
+  [key: string]: unknown;
 };
 
-// Get Collection Reference
+/**
+ * 📁 Get Collection Reference from path
+ * Example path: ["users", uid, "goals"]
+ */
 const getCollectionRef = (
   path: string[]
 ): CollectionReference<DocumentData> => {
@@ -35,29 +41,25 @@ const getCollectionRef = (
     throw new Error("Invalid collection path");
   }
 
-  let current: Firestore | DocumentReference<DocumentData> = db;
+  let ref: any = db;
 
   for (let i = 0; i < path.length - 1; i += 2) {
-    const col = path[i];
-    const docId = path[i + 1];
-
-    current = doc(current, col, docId);
+    ref = doc(ref, path[i], path[i + 1]);
   }
 
-  // Final segment MUST be a collection
-  const lastCollection = path[path.length - 1];
-
-  return collection(current, lastCollection);
+  return collection(ref, path[path.length - 1]);
 };
 
-// Get Document Reference
+/**
+ * 📄 Get Document Reference
+ */
 const getDocumentRef = (path: string[]): DocumentReference<DocumentData> => {
   return doc(db, ...path);
 };
 
 export const firestoreService = {
   // ===========================================================
-  // 🔥 GET DOCUMENTS WITH FILTER + ORDERBY + LIMIT
+  // 🔥 GET DOCUMENTS
   // ===========================================================
   getDocumentsAtPath: async (
     path: string[],
@@ -72,17 +74,14 @@ export const firestoreService = {
 
     const constraints: QueryConstraint[] = [];
 
-    // Add filters
-    filters.forEach((f) => {
-      constraints.push(where(f.field, f.op, f.value));
-    });
+    filters.forEach((f) =>
+      constraints.push(where(f.field, f.op, f.value))
+    );
 
-    // Add orderBy
     if (options?.orderByField) {
       constraints.push(orderBy(options.orderByField, options.order ?? "asc"));
     }
 
-    // Add limit
     if (options?.limit) {
       constraints.push(limit(options.limit));
     }
@@ -93,13 +92,13 @@ export const firestoreService = {
     const snapshot = await getDocs(q);
 
     return snapshot.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({
-      id: d.id,
-      ...d.data(),
+      ...d.data(),   // data first
+      id: d.id,      // Firestore ID ALWAYS wins
     }));
   },
 
   // ===========================================================
-  // 🔥 REALTIME LISTENER WITH FILTER + ORDERBY + LIMIT
+  // 🔥 REALTIME COLLECTION LISTENER
   // ===========================================================
   listenDocumentsAtPath: (
     path: string[],
@@ -113,20 +112,16 @@ export const firestoreService = {
     }
   ) => {
     const colRef = getCollectionRef(path);
-
     const constraints: QueryConstraint[] = [];
 
-    // Add filters
-    filters.forEach((f) => {
-      constraints.push(where(f.field, f.op, f.value));
-    });
+    filters.forEach((f) =>
+      constraints.push(where(f.field, f.op, f.value))
+    );
 
-    // Add orderBy
     if (options?.orderByField) {
       constraints.push(orderBy(options.orderByField, options.order ?? "asc"));
     }
 
-    // Add limit
     if (options?.limit) {
       constraints.push(limit(options.limit));
     }
@@ -134,68 +129,64 @@ export const firestoreService = {
     const q =
       constraints.length > 0 ? query(colRef, ...constraints) : colRef;
 
-    const unsubscribe = onSnapshot(
+    return onSnapshot(
       q,
       (snapshot) => {
-        const data = snapshot.docs.map(
-          (d: QueryDocumentSnapshot<DocumentData>) => ({
-            id: d.id,
-            ...d.data(),
-          })
-        );
-        callback(data);
+        const docs = snapshot.docs.map((d) => ({
+          ...d.data(),
+          id: d.id, // Firestore ID overrides everything
+        }));
+        callback(docs);
       },
       (error) => {
-        console.error("Firestore onSnapshot error:", error);
-        if (errorCallback) errorCallback(error);
+        console.error("Firestore listener error:", error);
+        errorCallback?.(error);
       }
     );
-
-    return unsubscribe;
   },
 
   // ===========================================================
   // 🔥 ADD DOCUMENT
   // ===========================================================
-addDocumentAtPath: async (
-  path: string[],
-  data: DocumentData
-): Promise<FirestoreDoc> => {
+  addDocumentAtPath: async (
+    path: string[],
+    data: DocumentData
+  ): Promise<FirestoreDoc> => {
+    const colRef = getCollectionRef(path);
+    const docRef = doc(colRef);
 
-  const colRef = getCollectionRef(path);
+    const docData = {
+      ...data,
+      createdAt: serverTimestamp(),
+    };
 
-  // ⭐ Create document reference (gives auto ID)
-  const docRef = doc(colRef);
+    await setDoc(docRef, docData);
 
-  const docData = {
-    id: docRef.id,              // ⭐ Store ID inside document
-                   // ⭐ Every goal starts with 0
-    createdAt: serverTimestamp(),
-    ...data,
-  };
-
-  // ⭐ Use setDoc so we can write custom ID into document
-  await setDoc(docRef, docData);
-
-  return docData;  // Already includes id
-},
-
+    return {
+      ...data,
+      id: docRef.id,
+    };
+  },
 
   // ===========================================================
   // 🔥 GET SINGLE DOCUMENT
   // ===========================================================
-  getDocumentAtPath: async (path: string[]): Promise<FirestoreDoc | null> => {
+  getDocumentAtPath: async (
+    path: string[]
+  ): Promise<FirestoreDoc | null> => {
     const docRef = getDocumentRef(path);
     const snapshot = await getDoc(docRef);
 
-    if (snapshot.exists()) {
-      return { id: snapshot.id, ...snapshot.data() };
-    }
-    return null;
+    if (!snapshot.exists()) return null;
+
+    return {
+      ...snapshot.data(),
+      id: snapshot.id,
+    };
   },
 
   // ===========================================================
-  // 🔥 LISTEN TO SINGLE DOCUMENT
+  // 🔥 REALTIME SINGLE DOCUMENT
   // ===========================================================
   listenDocumentAtPath: (
     path: string[],
@@ -204,34 +195,36 @@ addDocumentAtPath: async (
   ) => {
     const docRef = getDocumentRef(path);
 
-    const unsubscribe = onSnapshot(
+    return onSnapshot(
       docRef,
       (snapshot) => {
-        if (snapshot.exists()) {
-          callback({ id: snapshot.id, ...snapshot.data() });
-        } else {
+        if (!snapshot.exists()) {
           callback(null);
+          return;
         }
+
+        callback({
+          ...snapshot.data(),
+          id: snapshot.id,
+        });
       },
       (error) => {
-        console.error("Firestore onSnapshot error:", error);
-        if (errorCallback) errorCallback(error);
+        console.error("Firestore doc listener error:", error);
+        errorCallback?.(error);
       }
     );
-
-    return unsubscribe;
   },
 
   // ===========================================================
   // 🔥 UPDATE DOCUMENT
   // ===========================================================
- updateDocumentAtPath: async (
-  path: string[],
-  data: DocumentData
-): Promise<void> => {
-  const docRef = getDocumentRef(path);
-  await updateDoc(docRef, data);
-},
+  updateDocumentAtPath: async (
+    path: string[],
+    data: DocumentData
+  ): Promise<void> => {
+    const docRef = getDocumentRef(path);
+    await updateDoc(docRef, data);
+  },
 
   // ===========================================================
   // 🔥 DELETE DOCUMENT

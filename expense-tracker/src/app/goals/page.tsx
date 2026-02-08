@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, {useState } from "react";
@@ -22,12 +20,8 @@ import {
 import toast from "react-hot-toast";
 import GoalCompletedModal from "../components/CompletedModal";
 
- type FirestoreTimestamp = {
-  seconds: number;
-  nanoseconds: number;
-};
+
 function Page() {
-  
   const { user } = useAuthStore();
 
   const {
@@ -113,40 +107,27 @@ const [contributions, setContributions] = useState<unknown[]>([]);
             Math.floor((Number(current) / Number(goal.targetAmount)) * 100),
             100
           );
-        
-
-const getDaysLeft = (targetDate: unknown) => {
+          const getDaysLeft = (targetDate: any) => {
   if (!targetDate) return 0;
 
   let dateObj: Date;
 
-  // ✅ Firestore Timestamp
-  if (
-    typeof targetDate === "object" &&
-    targetDate !== null &&
-    "seconds" in targetDate
-  ) {
-    const ts = targetDate as FirestoreTimestamp;
-    dateObj = new Date(ts.seconds * 1000);
+  // 🔹 Case 1: Firestore Timestamp
+  if (targetDate?.seconds) {
+    dateObj = new Date(targetDate.seconds * 1000);
   }
-  // ✅ JS Date
+  // 🔹 Case 2: Already Date object
   else if (targetDate instanceof Date) {
     dateObj = targetDate;
   }
-  // ✅ String date
-  else if (typeof targetDate === "string") {
-    dateObj = new Date(targetDate);
-  }
-  // ❌ Unknown format
+  // 🔹 Case 3: String
   else {
-    return 0;
+    dateObj = new Date(targetDate);
   }
 
   if (isNaN(dateObj.getTime())) return 0;
 
-  return Math.ceil(
-    (dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-  );
+  return Math.ceil((dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 };
 
           const daysLeft = getDaysLeft(goal.targetDate);
@@ -296,6 +277,7 @@ const getDaysLeft = (targetDate: unknown) => {
     ...updated,
     current: Number(updated.current || 0),
     targetAmount: Number(updated.targetAmount || 0)
+    
   }).then(() => {
     toast.success("Goal updated successfully!");  // ⭐ ADD HERE
   })

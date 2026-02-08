@@ -47,10 +47,10 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
         <div className="space-y-2">
       <label className="label">Goal Type</label>
         <input
-          type="number"
+          type="text"
           className="input-field"
-          value={form.targetAmount}
-          onChange={(e) => handleChange("targetAmount", Number(e.target.value) || 0)}
+          value={form.goalType}
+          onChange={(e) => handleChange("goalType",(e.target.value) || "")}
         />
         </div>
         <div className="space-y-2">
@@ -58,8 +58,8 @@ export default function EditGoalDialog({ goal, onClose, onSave }:EditGoalTypePro
  <input
           type="number"
           className="input-field"
-          value={form.current}
-          onChange={(e) => handleChange("current", Number(e.target.value) || 0)}
+          value={form.targetAmount}
+          onChange={(e) => handleChange("targetAmount", Number(e.target.value) || 0)}
         />
 
         </div>
