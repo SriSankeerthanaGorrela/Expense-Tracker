@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     siteName: "Expense Tracker",
     images: [
       {
-        url: "/og-image.png", // add this image in public/
+        url: "/og-image.png", 
         width: 1200,
         height: 630,
         alt: "Expense Tracker App Preview",

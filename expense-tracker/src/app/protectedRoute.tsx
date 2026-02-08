@@ -14,12 +14,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Run auth check on mount
+  
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  // Redirect logic
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenicated) {
@@ -46,16 +45,6 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenicated, isNewuser, isLoading, pathname, router]);
 
-  // Loading state
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       Loading...
-  //     </div>
-  //   );
-  // }
-
-  // Not logged in → Auth pages
   if (!isAuthenicated) {
     return (
       <AuthLayout>
