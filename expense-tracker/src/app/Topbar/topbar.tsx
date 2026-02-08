@@ -39,7 +39,12 @@ export function Topbar() {
           </button> */}
 
           <div className="w-10 h-10 rounded-full bg-teal-400 flex items-center justify-center text-white cursor-pointer">
-            <span>SK</span>
+            <span> {user?.name
+      ?.split(" ")
+      .map(word => word[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase()}</span>
           </div>
         </div>
       </div>
