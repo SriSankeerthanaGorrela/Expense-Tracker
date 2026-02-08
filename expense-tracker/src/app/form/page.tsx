@@ -5,7 +5,7 @@ import SecondStep from "./SecondStep";
 import FirstStep from "./FirstStep";
 
 export default function StepProgressCard() {
-  const [currentStep, setCurrentStep] = useState(1); // step: 1–3
+  const [currentStep, setCurrentStep] = useState(1); 
 
   const steps = [1, 2, 3]; 
   const RenderStepContent=() => {

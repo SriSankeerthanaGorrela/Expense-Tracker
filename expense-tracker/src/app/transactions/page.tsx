@@ -71,15 +71,7 @@ function Page() {
     setOpenDialog(false);
   };
 
-  // const handleAddTransaction = async (newTransaction: recentTransactionType) => {
-  //   const docRef = await addDocument(newTransaction);
-
-  //   const transactionWithId = { ...newTransaction, id: docRef.id };
-  //   console.log("✅ Added transaction:", transactionWithId);
-
-  //   setFilteredTransaction((prev) => [transactionWithId, ...prev]);
-  //   setOpenDialog(false);
-  // };
+  
 
   const handleEdit = (transaction: recentTransactionType) => {
     setEditingTransaction(transaction);

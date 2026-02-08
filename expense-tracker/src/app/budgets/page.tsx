@@ -179,10 +179,10 @@ const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
               >
                 <CircleAlert className={`w-4 h-4 ${style.icon}`} />
                 {budget.percentage >= 100
-                  ? "Budget exceeded!"
+                  ? "Budget exceeded! this month."
                   : budget.percentage >= 90
-                  ? "You're approaching your budget limit."
-                  : "You're within your budget."}
+                  ? "You're approaching your budget limit per month."
+                  : "You're within your budget this month."}
               </p>
             </div>
           );
